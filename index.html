@@ -167,30 +167,6 @@
       color: rgba(255,255,255,0.7);
     }
 
-    /* 🔔 Toast Notification */
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
-      color: #FFD700;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      text-align: center;
-      max-width: 90%;
-      border: 1px solid rgba(255,215,0,0.3);
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-
     /* Watermark: Tetap terlihat */
     .watermark {
       position: fixed;
@@ -224,12 +200,6 @@
   <div class="watermark">suryawanp</div>
 
   <div class="overlay"></div>
-
-  <!-- 🔔 Toast Notification -->
-  <div class="toast" id="toast">
-    Harap izinkan akses lokasi untuk pengalaman terbaik.<br>
-    <small>📍 Pitaloka bekerja paling akurat dengan GPS</small>
-  </div>
 
   <div class="container">
     <header>
@@ -295,17 +265,6 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
   <script>
-    // === TAMPILKAN TOAST NOTIFICATION ===
-    function showToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 5000);
-    }
-
-    window.addEventListener('load', showToast);
-
     // === SALAM SESUAI WAKTU ===
     function updateGreeting() {
       const now = new Date();
