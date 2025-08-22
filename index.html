@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pitaloka - Pengisian Data Lokasi Usaha</title>
-  <meta name="description" content="Aplikasi untuk pendataan usaha" />
+  <meta name="description" content="Aplikasi lokal untuk pendataan usaha - akurasi tinggi, 100% offline" />
 
   <!-- Embed Manifest JSON (inline base64) -->
   <link rel="manifest" href="application/json;base64,ewogICJuYW1lIjogIlBpdGFsb2thIiwKICAic2hvcnRfbmFtZSI6ICJQaXRhbG9rYSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX2NvbG9yIjogIiNE MjY5MUUiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8yNS8yNTY1Ny5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
@@ -25,9 +25,9 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
-    /* 🌅 Background Keindahan Pulau Bali */
+    /* 🌅 Background: Pantai Kelingking, Nusa Penida */
     body {
-      background: url('https://images.unsplash.com/photo-1560256430-3ce5d1c9d44c?ixlib=rb-4.0.3&q=85&fm=jpg') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1596394722345-5f513a8e3f5a?w=1600&q=85') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
       min-height: 100vh;
@@ -35,13 +35,13 @@
       overflow-x: hidden;
     }
 
-    /* Overlay transparan agar teks terbaca */
+    /* Overlay transparan agar teks terbaca (lebih terang dari sebelumnya) */
     .overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(135deg, 
-        rgba(0,0,0,0.75), 
-        rgba(30,10,10,0.8)
+        rgba(0,0,0,0.5), 
+        rgba(30,10,10,0.6)
       );
       z-index: 0;
     }
@@ -87,6 +87,31 @@
       margin: 5px 0 15px;
       font-style: italic;
       text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+    }
+
+    /* Tombol Lokasi di atas peta */
+    .action-row {
+      text-align: center;
+      margin: 10px 0 15px;
+    }
+
+    .btn-location {
+      background: #FFD700;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn-location:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,215,0,0.6);
     }
 
     /* Peta di bawah judul */
@@ -193,49 +218,94 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* 🔔 Notifikasi Izin Lokasi Elegan */
-    .location-notice {
+    /* 🔔 Toast Notification - Eye Catching */
+    .toast {
       position: fixed;
-      top: 50%;
+      top: 20px;
       left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 400px;
-      background: rgba(0,0,0,0.85);
-      color: white;
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      z-index: 9999;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,215,0,0.3);
-      backdrop-filter: blur(10px);
-    }
-
-    .location-notice h3 {
-      color: var(--bali-yellow);
-      margin-bottom: 12px;
-    }
-
-    .location-notice p {
-      font-size: 0.95rem;
-      margin: 10px 0;
-      line-height: 1.5;
-    }
-
-    .location-notice button {
-      background: #FFD700;
-      color: #000;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #FFD700;
+      padding: 16px 30px;
+      border-radius: 14px;
+      font-size: 1rem;
       font-weight: bold;
-      padding: 14px 30px;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 15px rgba(255,215,0,0.4);
-      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      text-align: center;
+      max-width: 90%;
+      border: 2px solid #FFD700;
+      animation: pulse 1.5s infinite;
     }
 
-    .location-notice button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* 📋 Modal Lihat Semua Data */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 9998;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: rgba(255,255,255,0.95);
+      color: #000;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .modal-header h3 {
+      color: #D2691E;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: #D2691E;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .data-item {
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border-left: 4px solid #D2691E;
+    }
+
+    .data-item p {
+      margin: 4px 0;
+      font-size: 0.95rem;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
     }
 
     @keyframes rotate { 
@@ -255,11 +325,10 @@
 
   <div class="overlay"></div>
 
-  <!-- 🔔 NOTIFIKASI IZIN LOKASI ELEGAN -->
-  <div class="location-notice" id="locationNotice">
-    <h3>📍 Akses Lokasi Diperlukan</h3>
-    <p>Untuk akurasi tinggi, izinkan akses lokasi.<br><small>(Aplikasi tidak bisa berjalan tanpa izin ini)</small></p>
-    <button id="allowLocationBtn">✅ IZINKAN LOKASI</button>
+  <!-- 🔔 Toast Notification (3x muncul) -->
+  <div class="toast" id="toast">
+    📍 Izinkan akses lokasi untuk akurasi tinggi!
+    <br><small>Gunakan tombol di bawah untuk mulai</small>
   </div>
 
   <div class="container">
@@ -269,6 +338,11 @@
       <div class="greeting" id="greeting">Sedang memuat salam...</div>
       <div class="datetime" id="datetime">Sedang memuat waktu...</div>
     </header>
+
+    <!-- 🔘 TOMBOL LOKASI DI ATAS PETA -->
+    <div class="action-row">
+      <button id="getLocation" class="btn-location">📍 Dapatkan Lokasi (GPS/EXIF)</button>
+    </div>
 
     <!-- 🗺️ Peta -->
     <div class="map-container">
@@ -284,7 +358,7 @@
 
     <div class="form-group"><label>Nama Usaha</label><input type="text" id="namaUsaha" required /></div>
     <div class="form-group"><label>Pemilik</label><input type="text" id="pemilik" required /></div>
-    <div class="form-group"><label>Alamat</label><textarea id="alamat" readonly placeholder="Klik peta atau 'Dapatkan Lokasi'"></textarea></div>
+    <div class="form-group"><label>Alamat</label><textarea id="alamat" readonly placeholder="Klik tombol lokasi atau peta"></textarea></div>
     <div class="form-group"><label>Jenis Usaha</label>
       <select id="jenisUsaha">
         <option value="">Pilih...</option>
@@ -303,11 +377,11 @@
       <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple />
       <div class="image-preview" id="imagePreview"></div>
     </div>
-    <button id="getLocation">📍 Dapatkan Lokasi (GPS/EXIF)</button>
-    <button id="saveData">💾 Simpan Data</button>
     <button id="fetchPOI">🔍 Ambil POI Radius 100m</button>
+    <button id="saveData">💾 Simpan Data</button>
     <button id="exportData" disabled>📤 Ekspor Data Usaha</button>
     <button id="exportPOI" disabled>📤 Ekspor POI (POIxx.xlsx)</button>
+    <button id="viewAllData">📋 Lihat Semua Data</button>
 
     <div class="info-box">
       <strong>💡 Tips:</strong>
@@ -327,66 +401,20 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
   <script>
-    // === GLOBALS ===
-    let map, marker;
-    let currentLat = -8.409518, currentLng = 115.188919;
-    let imagesData = [];
-    let poiData = [];
-    let isDataSaved = false;
-
-    // ✅ Tidak pakai localStorage → pakai variabel sementara
-    let locationPermissionGranted = false;
-
-    // === TAMPILKAN NOTIFIKASI IZIN LOKASI ===
-    if (!locationPermissionGranted) {
-      document.getElementById('locationNotice').style.display = 'block';
+    // === TAMPILKAN TOAST 3x dengan jeda ===
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(showToast, 3000); // Tampilkan lagi setelah 3 detik
+      }, 3000); // Tahan 3 detik
     }
 
-    // Tombol "IZINKAN LOKASI"
-    document.getElementById('allowLocationBtn').addEventListener('click', () => {
-      locationPermissionGranted = true;
-      const btn = document.getElementById('allowLocationBtn');
-      btn.disabled = true;
-      btn.textContent = '🔍 Mendeteksi lokasi...';
-
-      if (!navigator.geolocation) {
-        alert('Geolocation tidak didukung oleh browser ini.');
-        btn.disabled = false;
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude, accuracy } = pos.coords;
-          currentLat = latitude;
-          currentLng = longitude;
-
-          // Sembunyikan notifikasi
-          document.getElementById('locationNotice').style.display = 'none';
-
-          // Inisialisasi peta
-          initMap(latitude, longitude);
-          reverseGeocode(latitude, longitude);
-
-          alert(`✅ Lokasi ditemukan: ${accuracy.toFixed(1)} meter`);
-        },
-        (err) => {
-          const btn = document.getElementById('allowLocationBtn');
-          btn.disabled = false;
-          btn.textContent = '❌ Gagal, coba lagi';
-          let msg = 'GPS gagal: ';
-          if (err.code === err.PERMISSION_DENIED) {
-            msg += 'Izin ditolak. Harap izinkan di pengaturan.';
-          } else if (err.code === err.POSITION_UNAVAILABLE) {
-            msg += 'Lokasi tidak tersedia.';
-          } else {
-            msg += err.message;
-          }
-          alert(msg);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
-    });
+    // Tampilkan toast 3 kali
+    setTimeout(showToast, 1000);
+    setTimeout(() => document.getElementById('toast').classList.remove('show'), 10000);
+    setTimeout(() => document.getElementById('toast').style.display = 'none', 10500);
 
     // === SALAM SESUAI WAKTU ===
     function updateGreeting() {
@@ -413,6 +441,13 @@
     }
 
     setInterval(updateDateTime, 1000);
+
+    // === GLOBALS ===
+    let map, marker;
+    let currentLat = -8.409518, currentLng = 115.188919;
+    let imagesData = [];
+    let poiData = [];
+    let isDataSaved = false;
 
     // === INIT MAP ===
     function initMap(lat, lng) {
@@ -461,7 +496,7 @@
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
-    }
+    });
 
     // === REVERSE GEOCODING ===
     async function reverseGeocode(lat, lng) {
@@ -570,16 +605,85 @@
       document.getElementById('exportData').disabled = false;
       document.getElementById('exportPOI').disabled = false;
       showSaveToast();
+
+      // Simpan data ke localStorage
+      const allData = JSON.parse(localStorage.getItem('pitalokaData') || '[]');
+      allData.push({
+        nama,
+        pemilik,
+        alamat,
+        jenisUsaha: document.getElementById('jenisUsaha').value,
+        jamOperasional: document.getElementById('jamOperasional').value,
+        produk: document.getElementById('produk').value,
+        latitude: currentLat,
+        longitude: currentLng,
+        timestamp: new Date().toLocaleString(),
+        foto: imagesData.length > 0 ? 'Ya' : 'Tidak'
+      });
+      localStorage.setItem('pitalokaData', JSON.stringify(allData));
     });
 
     // === TOAST SUKSES SIMPAN ===
     function showSaveToast() {
-      const toast = document.getElementById('save-toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,128,0,0.95);
+        color: white;
+        padding: 16px 30px;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: bold;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        z-index: 9999;
+        animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+      `;
+      toast.textContent = '✅ Data berhasil disimpan! Sekarang Anda bisa ekspor.';
+      document.body.appendChild(toast);
+      setTimeout(() => document.body.removeChild(toast), 3500);
     }
+
+    // === LIHAT SEMUA DATA ===
+    document.getElementById('viewAllData').addEventListener('click', () => {
+      const allData = JSON.parse(localStorage.getItem('pitalokaData') || '[]');
+      if (allData.length === 0) {
+        alert('Belum ada data yang disimpan.');
+        return;
+      }
+
+      // Buat modal
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>📋 Semua Data Usaha</h3>
+            <button class="close-btn">&times;</button>
+          </div>
+          <div id="dataList">
+            ${allData.map((item, i) => `
+              <div class="data-item">
+                <p><strong>Nama Usaha:</strong> ${item.nama}</p>
+                <p><strong>Pemilik:</strong> ${item.pemilik}</p>
+                <p><strong>Alamat:</strong> ${item.alamat}</p>
+                <p><strong>Lokasi:</strong> ${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</p>
+                <p><strong>Waktu:</strong> ${item.timestamp}</p>
+                <p><strong>Foto:</strong> ${item.foto}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Tutup modal
+      modal.querySelector('.close-btn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+    });
 
     // === EKSPOR DATA USAHA ===
     document.getElementById('exportData').addEventListener('click', () => {
