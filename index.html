@@ -167,21 +167,75 @@
       color: rgba(255,255,255,0.7);
     }
 
-    /* Watermark: Tetap terlihat */
+    /* 💠 Watermark Anti-Jiplak - Kontras Tinggi */
     .watermark {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(360deg);
-      font-size: 1.8rem;
+      font-size: 2.5rem;
       font-weight: bold;
-      color: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 215, 0, 0.15);
+      text-shadow: 
+        0 0 5px rgba(0,0,0,0.5),
+        0 0 10px rgba(0,0,0,0.3);
       pointer-events: none;
       z-index: 1;
       animation: rotate 12s linear infinite, float 4s ease-in-out infinite;
-      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px);
+      background: repeating-linear-gradient(
+        45deg, 
+        transparent, 
+        transparent 10px, 
+        rgba(255, 215, 0, 0.05) 10px, 
+        rgba(255, 215, 0, 0.05) 20px
+      );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+
+    /* 🔔 Notifikasi Izin Lokasi Elegan */
+    .location-notice {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 400px;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      z-index: 9999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,215,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .location-notice h3 {
+      color: var(--bali-yellow);
+      margin-bottom: 12px;
+    }
+
+    .location-notice p {
+      font-size: 0.95rem;
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .location-notice button {
+      background: #FFD700;
+      color: #000;
+      font-weight: bold;
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+      transition: all 0.3s ease;
+    }
+
+    .location-notice button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,215,0,0.5);
     }
 
     @keyframes rotate { 
@@ -190,16 +244,23 @@
     }
     @keyframes float { 
       0%, 100% { transform: translate(-50%, -50%) translateY(0); } 
-      50% { transform: translate(-50%, -50%) translateY(-15px); } 
+      50% { transform: translate(-50%, -50%) translateY(-20px); } 
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔐 Watermark Anti-Jiplak -->
+  <!-- 💠 Watermark Anti-Jiplak -->
   <div class="watermark">suryawanp</div>
 
   <div class="overlay"></div>
+
+  <!-- 🔔 NOTIFIKASI IZIN LOKASI ELEGAN -->
+  <div class="location-notice" id="locationNotice">
+    <h3>📍 Akses Lokasi Diperlukan</h3>
+    <p>Untuk akurasi tinggi, izinkan akses lokasi.<br><small>(Aplikasi tidak bisa berjalan tanpa izin ini)</small></p>
+    <button id="allowLocationBtn">✅ IZINKAN LOKASI</button>
+  </div>
 
   <div class="container">
     <header>
@@ -209,7 +270,7 @@
       <div class="datetime" id="datetime">Sedang memuat waktu...</div>
     </header>
 
-    <!-- 🗺️ Peta: Sekarang di bawah judul -->
+    <!-- 🗺️ Peta -->
     <div class="map-container">
       <div id="map"></div>
     </div>
@@ -243,9 +304,10 @@
       <div class="image-preview" id="imagePreview"></div>
     </div>
     <button id="getLocation">📍 Dapatkan Lokasi (GPS/EXIF)</button>
+    <button id="saveData">💾 Simpan Data</button>
     <button id="fetchPOI">🔍 Ambil POI Radius 100m</button>
-    <button id="exportData">📤 Ekspor Data Usaha</button>
-    <button id="exportPOI">📤 Ekspor POI (POIxx.xlsx)</button>
+    <button id="exportData" disabled>📤 Ekspor Data Usaha</button>
+    <button id="exportPOI" disabled>📤 Ekspor POI (POIxx.xlsx)</button>
 
     <div class="info-box">
       <strong>💡 Tips:</strong>
@@ -265,6 +327,67 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
   <script>
+    // === GLOBALS ===
+    let map, marker;
+    let currentLat = -8.409518, currentLng = 115.188919;
+    let imagesData = [];
+    let poiData = [];
+    let isDataSaved = false;
+
+    // ✅ Tidak pakai localStorage → pakai variabel sementara
+    let locationPermissionGranted = false;
+
+    // === TAMPILKAN NOTIFIKASI IZIN LOKASI ===
+    if (!locationPermissionGranted) {
+      document.getElementById('locationNotice').style.display = 'block';
+    }
+
+    // Tombol "IZINKAN LOKASI"
+    document.getElementById('allowLocationBtn').addEventListener('click', () => {
+      locationPermissionGranted = true;
+      const btn = document.getElementById('allowLocationBtn');
+      btn.disabled = true;
+      btn.textContent = '🔍 Mendeteksi lokasi...';
+
+      if (!navigator.geolocation) {
+        alert('Geolocation tidak didukung oleh browser ini.');
+        btn.disabled = false;
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          currentLat = latitude;
+          currentLng = longitude;
+
+          // Sembunyikan notifikasi
+          document.getElementById('locationNotice').style.display = 'none';
+
+          // Inisialisasi peta
+          initMap(latitude, longitude);
+          reverseGeocode(latitude, longitude);
+
+          alert(`✅ Lokasi ditemukan: ${accuracy.toFixed(1)} meter`);
+        },
+        (err) => {
+          const btn = document.getElementById('allowLocationBtn');
+          btn.disabled = false;
+          btn.textContent = '❌ Gagal, coba lagi';
+          let msg = 'GPS gagal: ';
+          if (err.code === err.PERMISSION_DENIED) {
+            msg += 'Izin ditolak. Harap izinkan di pengaturan.';
+          } else if (err.code === err.POSITION_UNAVAILABLE) {
+            msg += 'Lokasi tidak tersedia.';
+          } else {
+            msg += err.message;
+          }
+          alert(msg);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    });
+
     // === SALAM SESUAI WAKTU ===
     function updateGreeting() {
       const now = new Date();
@@ -277,21 +400,19 @@
       document.getElementById('greeting').textContent = `${greeting}, Pengguna Pitaloka`;
     }
 
-    // === TANGGAL & WAKTU REAL-TIME ===
+    // === TANGGAL & WAKTU REAL-TIME (Format: DD-MM-YYYY, hh:mm) ===
     function updateDateTime() {
       const now = new Date();
-      const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-      const formatted = now.toLocaleDateString('id-ID', options).replace(/\./g, '/');
-      document.getElementById('datetime').textContent = formatted;
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const dateString = `${day}-${month}-${year}, ${hours}:${minutes}`;
+      document.getElementById('datetime').textContent = dateString;
     }
 
     setInterval(updateDateTime, 1000);
-
-    // === GLOBALS ===
-    let map, marker;
-    let currentLat = -8.409518, currentLng = 115.188919;
-    let imagesData = [];
-    let poiData = [];
 
     // === INIT MAP ===
     function initMap(lat, lng) {
@@ -340,7 +461,7 @@
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
-    });
+    }
 
     // === REVERSE GEOCODING ===
     async function reverseGeocode(lat, lng) {
@@ -436,15 +557,39 @@
       return dd;
     }
 
-    // === EKSPOR DATA USAHA ===
-    document.getElementById('exportData').addEventListener('click', () => {
+    // === SIMPAN DATA ===
+    document.getElementById('saveData').addEventListener('click', () => {
       const nama = document.getElementById('namaUsaha').value;
       const pemilik = document.getElementById('pemilik').value;
       const alamat = document.getElementById('alamat').value;
       if (!nama || !pemilik || !alamat) {
-        alert('Isi semua data!');
+        alert('Isi semua data wajib!');
         return;
       }
+      isDataSaved = true;
+      document.getElementById('exportData').disabled = false;
+      document.getElementById('exportPOI').disabled = false;
+      showSaveToast();
+    });
+
+    // === TOAST SUKSES SIMPAN ===
+    function showSaveToast() {
+      const toast = document.getElementById('save-toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // === EKSPOR DATA USAHA ===
+    document.getElementById('exportData').addEventListener('click', () => {
+      if (!isDataSaved) {
+        alert('Harap simpan data dulu!');
+        return;
+      }
+      const nama = document.getElementById('namaUsaha').value;
+      const pemilik = document.getElementById('pemilik').value;
+      const alamat = document.getElementById('alamat').value;
       const wb = XLSX.utils.book_new();
       const formData = {
         'Nama Usaha': nama,
@@ -465,6 +610,10 @@
 
     // === EKSPOR POI ===
     document.getElementById('exportPOI').addEventListener('click', () => {
+      if (!isDataSaved) {
+        alert('Harap simpan data dulu!');
+        return;
+      }
       if (poiData.length === 0) {
         alert('Ambil POI dulu!');
         return;
