@@ -217,24 +217,47 @@ map = new maplibregl.Map({
   zoom: 18
 });
 
-// Add custom control to map
-const layerControl = document.createElement('div');
-layerControl.className = 'maplibregl-ctrl maplibregl-ctrl-group';
-layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; z-index: 1000;';
+// Add fullscreen control
+map.addControl(new maplibregl.FullscreenControl());
 
-layerControl.innerHTML = `
-  <button title="OpenStreetMap" onclick="setBase('osm')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">OSM</button>
-  <button title="Satelit" onclick="setBase('sat')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">SAT</button>
-  <button title="Hybrid" onclick="setBase('hybrid')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">HYB</button>
+// Add custom layer control with small buttons
+const layerControl = document.createElement('div');
+layerControl.className = 'maplibregl-ctrl';
+layerControl.style.cssText = `
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 1000;
 `;
+
+['osm', 'sat', 'hybrid'].forEach(mode => {
+  const btn = document.createElement('button');
+  btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
+  btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
+  btn.style.cssText = `
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    line-height: 30px;
+    padding: 0;
+    margin: 0;
+  `;
+  btn.onclick = () => setBase(mode);
+  layerControl.appendChild(btn);
+});
 
 // Add control to map container
 map.on('load', () => {
   map.getContainer().appendChild(layerControl);
 });
-
-// Add fullscreen control
-map.addControl(new maplibregl.FullscreenControl());
 
 // Click on map
 map.on('click', (e) => {
