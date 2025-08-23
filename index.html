@@ -182,37 +182,61 @@ document.getElementById('tab1Btn').onclick = ()=>switchTab(0);
 document.getElementById('tab2Btn').onclick = ()=>{ switchTab(1); fetchPOI(); };
 
 /* ========= Map ========= */
-let map,marker;
-map = new maplibregl.Map({
-  container: 'map',
-  style: {
+let map, marker;
+
+// Define styles
+const layers = {
+  osm: {
     version: 8,
     sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
     layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
   },
-  center: [118, -2.5],
-  zoom: 4.5
-});
-
-// Kontrol layer di dalam peta (ganti tombol luar)
-const layers = {
-  osm: { sources:{ osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256}},layers:[{id:'osm',type:'raster',source:'osm'}] },
-  sat: { sources:{ sat:{type:'raster',tiles:['https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmNWU2Zm4ifQ.c-LodNvl3792Wr8kbc3ke-Q'],tileSize:256}},layers:[{id:'sat',type:'raster',source:'sat'}] },
-  hybrid: { sources:{ sat:{type:'raster',tiles:['https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmNWU2Zm4ifQ.c-LodNvl3792Wr8kbc3ke-Q'],tileSize:256},osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256}},layers:[{id:'sat',type:'raster',source:'sat'},{id:'osm',type:'raster',source:'osm',paint:{'raster-opacity':0.6}}] }
+  sat: {
+    version: 8,
+    sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+    layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+  },
+  hybrid: {
+    version: 8,
+    sources: { 
+      sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 },
+      osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 }
+    },
+    layers: [
+      { id: 'sat', type: 'raster', source: 'sat' },
+      { id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-opacity': 0.6 } }
+    ]
+  }
 };
 
-// Tambahkan kontrol layer ke dalam peta
+// Initialize map with OSM
+map = new maplibregl.Map({
+  container: 'map',
+  style: layers.osm,
+  center: [115.188919, -8.409518],
+  zoom: 18
+});
+
+// Add custom control to map
 const layerControl = document.createElement('div');
 layerControl.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; z-index: 1000;';
+
 layerControl.innerHTML = `
-  <button title="OpenStreetMap" onclick="setBase('osm')" style="background:url('data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;#000&quot;><path d=&quot;M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z&quot;/></svg>') no-repeat center; width:30px; height:30px;"></button>
-  <button title="Satelit" onclick="setBase('sat')" style="background:url('data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;#000&quot;><path d=&quot;M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z&quot;/></svg>') no-repeat center; width:30px; height:30px;"></button>
-  <button title="Hybrid" onclick="setBase('hybrid')" style="background:url('data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;#000&quot;><path d=&quot;M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z&quot;/></svg>') no-repeat center; width:30px; height:30px;"></button>
+  <button title="OpenStreetMap" onclick="setBase('osm')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">OSM</button>
+  <button title="Satelit" onclick="setBase('sat')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">SAT</button>
+  <button title="Hybrid" onclick="setBase('hybrid')" style="background:#fff; width:30px; height:30px; border:none; font-size:0;">HYB</button>
 `;
+
+// Add control to map container
 map.on('load', () => {
   map.getContainer().appendChild(layerControl);
 });
 
+// Add fullscreen control
+map.addControl(new maplibregl.FullscreenControl());
+
+// Click on map
 map.on('click', (e) => {
   const { lng, lat } = e.lngLat;
   document.getElementById('coordBox').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
@@ -232,7 +256,7 @@ async function getLocation(){
   try{
     const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
     const { longitude, latitude } = pos.coords;
-    map.flyTo({ center: [longitude, latitude], zoom: 17, speed: 1.2, curve: 1.42 });
+    map.flyTo({ center: [longitude, latitude], zoom: 18, speed: 1.2 });
     if(marker) marker.remove();
     marker = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
     document.getElementById('coordBox').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
