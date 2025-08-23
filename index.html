@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>Pitaloka – PWA Final</title>
+<title>Pitaloka – Lili</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#00796b"/>
 <link rel="manifest" href="data:application/manifest+json,{
-  &quot;name&quot;:&quot;Pitaloka Final&quot;,
+  &quot;name&quot;:&quot;Pitaloka Lili&quot;,
   &quot;short_name&quot;:&quot;Pitaloka&quot;,
-  &quot;start_url&quot;:&quot;./pitaloka-final.html&quot;,
+  &quot;start_url&quot;:&quot;./pitaloka-lili.html&quot;,
   &quot;display&quot;:&quot;standalone&quot;,
   &quot;background_color&quot;:&quot;#ffffff&quot;,
   &quot;theme_color&quot;:&quot;#00796b&quot;
@@ -17,52 +17,100 @@
 <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-html,body{margin:0;padding:0;height:100%;font-family:system-ui,Arial;background:url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=60') center/cover fixed;color:#222}
-.header{text-align:center;padding:8px 0;background:rgba(0,0,0,0.45)}
-.header h1{margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;text-shadow:2px 2px 4px #000}
-.header .sub{font-size:1em;color:#FFD700;margin-top:-4px;text-shadow:1px 1px 2px #000}
-.header .salam{margin:2px 0;font-size:1.1em;color:#fff;text-shadow:1px 1px 2px #000}
-.header .clock{margin:0;font-size:1.3em;color:#fff;font-weight:bold;text-shadow:1px 1px 2px #000}
-.tabs{display:flex;background:#00796b;color:#fff}
-.tabs button{flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff}
-.tabs button.active{background:#004c40;font-weight:bold}
-.tab-content{display:none;padding:12px}
-.tab-content.active{display:block}
-#map{height:55vh;border-radius:6px;margin-bottom:8px}
-#coordBox{background:rgba(0,0,0,0.7);color:#fff;padding:6px;border-radius:4px;font-size:.9em;margin-bottom:6px}
-label{display:block;margin:6px 0 2px;font-size:.9em;color:#fff}
-input,textarea,select{width:100%;padding:6px;border-radius:4px;border:1px solid #aaa}
-button.primary{background:#00796b;color:#fff;border:none;padding:8px 16px;border-radius:4px;margin-top:6px}
-#poiListWrapper{background:rgba(0,0,0,0.75);border-radius:8px;padding:10px;color:#fff}
-#poiList{max-height:60vh;overflow:auto}
-.poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff}
-#toastHover{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.85);color:#FFD700;padding:18px 28px;
-  border-radius:10px;font-size:1.2em;font-weight:bold;z-index:99999;
-  cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.5);transition:opacity .4s;opacity:0;pointer-events:none}
-#toastHover.show{opacity:1;pointer-events:auto}
-#watermark{
-  position:fixed;z-index:999;top:50%;left:50%;
-  font-size:2.2em;font-weight:bold;color:rgba(255,255,255,.55);
-  animation:spin 6s linear infinite,blink 1.2s infinite;
-  pointer-events:none;transform:translate(-50%,-50%);
-}
-footer{
-  text-align:center;
-  padding:8px;
-  font-size:.85em;
-  color:#fff;
-  background:rgba(0,0,0,0.5);
-}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes blink{0%,100%{opacity:.55}50%{opacity:0}}
+  /* Mode Gelap Otomatis */
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121212; --text: #eee; --input-bg: #333; --btn-bg: #00695c; }
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f5f5f5; --text: #222; --input-bg: #fff; --btn-bg: #00796b; }
+  }
+
+  html,body{margin:0;padding:0;height:100%;font-family:system-ui,Arial;background:url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;color:var(--text)}
+  .header{text-align:center;padding:8px 0;background:rgba(0,0,0,0.45)}
+  .header h1{margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;text-shadow:2px 2px 4px #000}
+  .header .sub{font-size:1em;color:#FFD700;margin-top:-4px;text-shadow:1px 1px 2px #000}
+  .header .salam{margin:2px 0;font-size:1.1em;color:#fff;text-shadow:1px 1px 2px #000}
+  .header .clock{margin:0;font-size:1.3em;color:#fff;font-weight:bold;text-shadow:1px 1px 2px #000}
+  .tabs{display:flex;background:var(--btn-bg);color:#fff}
+  .tabs button{flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff}
+  .tabs button.active{background:#004c40;font-weight:bold}
+  .tab-content{display:none;padding:12px}
+  .tab-content.active{display:block}
+  .map-container{height:55vh;border-radius:6px;margin-bottom:8px;overflow:hidden}
+  #map,#mapSearch{height:100%}
+  #coordBox{background:rgba(0,0,0,0.7);color:#fff;padding:6px;border-radius:4px;font-size:.9em;margin-bottom:6px}
+  label{display:block;margin:6px 0 2px;font-size:.9em;color:var(--text)}
+  input,textarea,select{width:100%;padding:6px;border-radius:4px;border:1px solid #aaa;background:var(--input-bg);color:var(--text)}
+  button.primary{background:var(--btn-bg);color:#fff;border:none;padding:8px 16px;border-radius:4px;margin-top:6px}
+  #poiListWrapper{background:rgba(0,0,0,0.75);border-radius:8px;padding:10px;color:#fff}
+  #poiList{max-height:60vh;overflow:auto}
+  .poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff}
+  #toastHover{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:rgba(0,0,0,0.85);color:#FFD700;padding:18px 28px;
+    border-radius:10px;font-size:1.2em;font-weight:bold;z-index:99999;
+    cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.5);transition:opacity .4s;opacity:0;pointer-events:none}
+  #toastHover.show{opacity:1;pointer-events:auto}
+  #watermark{
+    position:fixed;z-index:999;top:50%;left:50%;
+    font-size:2.2em;font-weight:bold;color:rgba(255,255,255,.55);
+    animation:spin 6s linear infinite,blink 1.2s infinite;
+    pointer-events:none;transform:translate(-50%,-50%);}
+  footer{text-align:center;padding:8px;font-size:.85em;color:#fff;background:rgba(0,0,0,0.5)}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  @keyframes blink{0%,100%{opacity:.55}50%{opacity:0}}
+  /* Fullscreen Image Viewer */
+  .img-modal{display:none;position:fixed;z-index:1000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);align-items:center;justify-content:center}
+  .img-modal img{max-width:90%;max-height:90%}
+  /* QR Code Style */
+  .qrcode-section {
+    text-align: center;
+    margin: 15px 0;
+    opacity: 0.95;
+  }
+  .qrcode-section img {
+    width: 120px;
+    height: 120px;
+    border: 2px solid rgba(255,215,0,0.6);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    background: rgba(255,255,255,0.1);
+  }
+  .qrcode-section p {
+    font-size: 0.9rem;
+    margin: 5px 0;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+  }
+  /* Cloud Layer */
+  .cloud-layer{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.2) 70%);
+    z-index:9997;pointer-events:none;transition:opacity 2s ease-out;
+  }
+  /* Location Button */
+  .location-btn{
+    display:block;
+    width:80%;
+    max-width:300px;
+    margin:10px auto;
+    background:#00796b;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    font-size:1.1em;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  }
+  .location-btn.off{background:#d32f2f;}
 </style>
 </head>
 <body>
 <!-- Header -->
 <div class="header">
-  <h1><span style="font-size:1.3em">🌺</span> PITALOKA <span style="font-size:1.3em">🌺</span></h1>
+  <h1><span style="font-size:1.3em">🌸</span> PITALOKA <span style="font-size:1.3em">🌸</span></h1>
   <div class="sub">Pengisian Data Lokasi Usaha</div>
   <div class="salam" id="salam">Selamat datang</div>
   <div class="clock" id="clock">--:--, --.--.----</div>
@@ -72,11 +120,21 @@ footer{
 <div class="tabs">
   <button id="tab1Btn" class="active">Form Lokasi Usaha</button>
   <button id="tab2Btn">POI 500 m</button>
+  <button id="tab3Btn">🔍 Pencarian Alamat</button>
 </div>
 
 <!-- TAB 1 -->
 <div id="tab1" class="tab-content active">
-  <div id="map"></div>
+  <!-- Cloud Layer -->
+  <div class="cloud-layer" id="cloudLayer1"></div>
+  <!-- Toast Hover -->
+  <div id="toastHover">☁️ Klik untuk tembus awan & menukik ke lokasi Anda</div>
+  <!-- Location Button -->
+  <button id="locationBtn" class="location-btn" onclick="toggleLocation()">📍 Location: OFF</button>
+  <!-- Map Container -->
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
   <div id="coordBox">Lat: -- , Lng: --</div>
   <form id="formUsaha">
     <label>Nama Usaha / POI<input type="text" id="namaUsaha" required></label>
@@ -91,13 +149,14 @@ footer{
     <label>Produk/Jasa<textarea id="produkUsaha" rows="2"></textarea></label>
     <label>Segmentasi Konsumen<input type="text" id="segmenUsaha"></label>
     <label>Foto<input type="file" id="fotoUsaha" accept="image/*" multiple capture="environment"></label>
+    <div id="fotoPreview" style="margin:6px 0;display:flex;gap:6px;flex-wrap:wrap"></div>
     <label>Nama Pengisi<input type="text" id="namaPengisi" required></label>
     <label>NIP<input type="text" id="nipPengisi"></label>
     <label>Unit Kerja<input type="text" id="unitPengisi"></label>
     <button type="submit" class="primary">💾 Simpan ke Excel</button>
   </form>
   <button class="primary" onclick="lihatData()">📄 Lihat Data</button>
-  <button class="primary" onclick="exportExcel()">📤 Unduh Excel</button>
+  <button class="primary" onclick="shareData()">📤 Share File (.xlsx)</button>
   <div id="listData" style="margin-top:10px;font-size:.85em;color:#fff"></div>
 </div>
 
@@ -108,15 +167,57 @@ footer{
     <div id="poiList">Memuat POI...</div>
   </div>
   <button class="primary" onclick="exportExcel()">📤 Unduh Semua Data</button>
+  <button class="primary" onclick="shareData()">📤 Share File (.xlsx)</button>
 </div>
 
-<!-- Hover toast GPS -->
-<div id="toastHover" onclick="getLocation()">📌 Klik untuk aktifkan GPS presisi</div>
+<!-- TAB 3 -->
+<div id="tab3" class="tab-content">
+  <h3 style="color:#fff;text-shadow:1px 1px 2px #000">🔍 Cari Lokasi</h3>
+  <!-- Cloud Layer -->
+  <div class="cloud-layer" id="cloudLayer3"></div>
+  <!-- Toast Hover -->
+  <div id="toastHover3">☁️ Klik untuk tembus awan & menukik ke lokasi Anda</div>
+  <!-- Location Button -->
+  <button id="locationBtn3" class="location-btn" onclick="toggleLocation3()">📍 Location: OFF</button>
+  <!-- Map Container -->
+  <div class="map-container">
+    <div id="mapSearch"></div>
+  </div>
+  <div id="coordBoxSearch">Lat: -- , Lng: --</div>
+  <form id="formSearch">
+    <label>Nama Usaha / POI<input type="text" id="namaUsahaSearch" required></label>
+    <label>Alamat (auto/manual)<textarea id="alamatUsahaSearch" rows="2"></textarea></label>
+    <label>Kategori
+      <select id="kategoriUsahaSearch">
+        <option>Makanan & Minuman</option><option>Pariwisata</option>
+        <option>Perdagangan</option><option>Jasa</option><option>Lainnya</option>
+      </select>
+    </label>
+    <label>Foto<input type="file" id="fotoUsahaSearch" accept="image/*" multiple capture="environment"></label>
+    <div id="fotoPreviewSearch" style="margin:6px 0;display:flex;gap:6px;flex-wrap:wrap"></div>
+    <label>Nama Pengisi<input type="text" id="namaPengisiSearch" required></label>
+    <label>Unit Kerja<input type="text" id="unitPengisiSearch"></label>
+    <button type="submit" class="primary">💾 Simpan ke Excel</button>
+  </form>
+  <button class="primary" onclick="shareData()">📤 Share File (.xlsx)</button>
+</div>
+
 <div id="watermark">suryawanp@280</div>
+
+<!-- Fullscreen Image Viewer -->
+<div class="img-modal" id="imgModal">
+  <img id="modalImg" src="" alt="Full Image">
+</div>
+
+<!-- QR Code Section -->
+<div class="qrcode-section">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://suryawanpancakusuma.github.io/PITALOKA/&margin=1&ecc=M" alt="QR Code Pitaloka">
+  <p>📲 Akses cepat ke Pitaloka</p>
+</div>
 
 <!-- Footer -->
 <footer>
-  made with ❤️ by suryawan pancakusuma
+  made with ❤️ by suryawanp - versi Lili
 </footer>
 
 <script>
@@ -124,7 +225,7 @@ footer{
 if('serviceWorker' in navigator){
   const swCode = `
 self.addEventListener('install',e=>e.waitUntil(
-  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-final.html']))
+  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-lili.html']))
 ));
 self.addEventListener('fetch',e=>{
   e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
@@ -180,86 +281,45 @@ function switchTab(idx){
 }
 document.getElementById('tab1Btn').onclick = ()=>switchTab(0);
 document.getElementById('tab2Btn').onclick = ()=>{ switchTab(1); fetchPOI(); };
+document.getElementById('tab3Btn').onclick = ()=>switchTab(2);
 
-/* ========= Map ========= */
+/* ========= Map Utama (dengan efek sinematik) ========= */
 let map, marker;
 
-// Define styles
-const layers = {
-  osm: {
-    version: 8,
-    sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
-    layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
-  },
-  sat: {
+// Inisialisasi peta utama dari luar angkasa (satelit)
+map = new maplibregl.Map({
+  container: 'map',
+  style: {
     version: 8,
     sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
     layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
   },
-  hybrid: {
-    version: 8,
-    sources: { 
-      sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 },
-      osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 }
-    },
-    layers: [
-      { id: 'sat', type: 'raster', source: 'sat' },
-      { id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-opacity': 0.6 } }
-    ]
-  }
-};
-
-// Initialize map with OSM
-map = new maplibregl.Map({
-  container: 'map',
-  style: layers.osm,
-  center: [115.188919, -8.409518],
-  zoom: 18
+  center: [118, -2.5],
+  zoom: 4.5,
+  pitch: 0,
+  bearing: 0
 });
 
-// Add fullscreen control
-map.addControl(new maplibregl.FullscreenControl());
+// Tambahkan kompas
+map.addControl(new maplibregl.NavigationControl());
 
-// Add custom layer control with small buttons
+// Tambahkan kontrol layer
 const layerControl = document.createElement('div');
 layerControl.className = 'maplibregl-ctrl';
-layerControl.style.cssText = `
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  display: flex;
-  gap: 4px;
-  z-index: 1000;
-`;
-
+layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
 ['osm', 'sat', 'hybrid'].forEach(mode => {
   const btn = document.createElement('button');
   btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
   btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
-  btn.style.cssText = `
-    width: 30px;
-    height: 30px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.7em;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-    line-height: 30px;
-    padding: 0;
-    margin: 0;
-  `;
+  btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
   btn.onclick = () => setBase(mode);
   layerControl.appendChild(btn);
 });
-
-// Add control to map container
 map.on('load', () => {
   map.getContainer().appendChild(layerControl);
 });
 
-// Click on map
+// Klik peta utama
 map.on('click', (e) => {
   const { lng, lat } = e.lngLat;
   document.getElementById('coordBox').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
@@ -270,22 +330,217 @@ map.on('click', (e) => {
 
 /* ========= Layer toggle ========= */
 function setBase(mode){
-  map.setStyle(layers[mode]);
+  const styles = {
+    osm: {
+      version: 8,
+      sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
+      layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+    },
+    sat: {
+      version: 8,
+      sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+      layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+    },
+    hybrid: {
+      version: 8,
+      sources: { 
+        sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 },
+        osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 }
+      },
+      layers: [
+        { id: 'sat', type: 'raster', source: 'sat' },
+        { id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-opacity': 0.6 } }
+      ]
+    }
+  };
+  map.setStyle(styles[mode]);
 }
 
-/* ========= Geolocation + fly-to ========= */
-async function getLocation(){
-  document.getElementById('toastHover').classList.remove('show');
+/* ========= Geolocation + efek menembus awan (untuk Tab 1) ========= */
+document.getElementById('toastHover').onclick = async function(){
+  const cloudLayer = document.getElementById('cloudLayer1');
+  cloudLayer.style.opacity = '1';
+  setTimeout(() => cloudLayer.style.opacity = '0', 2000);
+  this.style.display = 'none';
   try{
     const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
-    const { longitude, latitude } = pos.coords;
-    map.flyTo({ center: [longitude, latitude], zoom: 18, speed: 1.2 });
+    const { longitude, latitude, accuracy } = pos.coords;
+    if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
+    map.flyTo({
+      center: [longitude, latitude],
+      zoom: 18,
+      speed: 1.8,
+      curve: 1.6,
+      easing(t) { return t; },
+      essential: true
+    });
     if(marker) marker.remove();
     marker = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
     document.getElementById('coordBox').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
     document.getElementById('alamatUsaha').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-  }catch{ alert('Gagal mendapatkan lokasi GPS'); }
+    await fetchAddress(latitude, longitude, document.getElementById('alamatUsaha'));
+  }catch(err){
+    alert('Gagal mendapatkan lokasi GPS: ' + err.message);
+  }
+};
+
+/* ========= Search Address ========= */
+async function fetchAddress(lat, lng, inputEl){
+  try{
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const data = await res.json();
+    inputEl.value = data.display_name || '';
+  }catch{ inputEl.value = 'Gagal muat alamat'; }
 }
+
+/* ========= Map Pencarian (dengan efek sinematik juga!) ========= */
+let mapSearch, markerSearch;
+
+// Inisialisasi peta pencarian dari luar angkasa
+mapSearch = new maplibregl.Map({
+  container: 'mapSearch',
+  style: {
+    version: 8,
+    sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+    layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+  },
+  center: [118, -2.5],
+  zoom: 4.5,
+  pitch: 0,
+  bearing: 0
+});
+
+mapSearch.addControl(new maplibregl.NavigationControl());
+
+// Klik peta pencarian
+mapSearch.on('click', (e) => {
+  const { lng, lat } = e.lngLat;
+  document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+  if(markerSearch) markerSearch.remove();
+  markerSearch = new maplibregl.Marker().setLngLat([lng, lat]).addTo(mapSearch);
+  document.getElementById('alamatUsahaSearch').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+});
+
+// Tambahkan kontrol layer ke peta pencarian
+const layerControl3 = document.createElement('div');
+layerControl3.className = 'maplibregl-ctrl';
+layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
+['osm', 'sat', 'hybrid'].forEach(mode => {
+  const btn = document.createElement('button');
+  btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
+  btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
+  btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
+  btn.onclick = () => setBase3(mode);
+  layerControl3.appendChild(btn);
+});
+mapSearch.on('load', () => {
+  mapSearch.getContainer().appendChild(layerControl3);
+});
+
+// Layer toggle untuk peta pencarian
+function setBase3(mode){
+  const styles = {
+    osm: {
+      version: 8,
+      sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
+      layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+    },
+    sat: {
+      version: 8,
+      sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+      layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+    },
+    hybrid: {
+      version: 8,
+      sources: { 
+        sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 },
+        osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 }
+      },
+      layers: [
+        { id: 'sat', type: 'raster', source: 'sat' },
+        { id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-opacity': 0.6 } }
+      ]
+    }
+  };
+  mapSearch.setStyle(styles[mode]);
+}
+
+// Geolocation untuk Tab 3
+document.getElementById('toastHover3').onclick = async function(){
+  const cloudLayer = document.getElementById('cloudLayer3');
+  cloudLayer.style.opacity = '1';
+  setTimeout(() => cloudLayer.style.opacity = '0', 2000);
+  this.style.display = 'none';
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
+    const { longitude, latitude, accuracy } = pos.coords;
+    if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
+    mapSearch.flyTo({
+      center: [longitude, latitude],
+      zoom: 18,
+      speed: 1.8,
+      curve: 1.6,
+      easing(t) { return t; },
+      essential: true
+    });
+    if(markerSearch) markerSearch.remove();
+    markerSearch = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(mapSearch);
+    document.getElementById('coordBoxSearch').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+    document.getElementById('alamatUsahaSearch').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+    await fetchAddress(latitude, longitude, document.getElementById('alamatUsahaSearch'));
+  }catch(err){
+    alert('Gagal mendapatkan lokasi GPS: ' + err.message);
+  }
+};
+
+// Search input
+document.getElementById('searchInput').addEventListener('keypress', async (e) => {
+  if(e.key !== 'Enter') return;
+  const q = e.target.value;
+  try{
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if(data.length > 0){
+      const { lat, lon } = data[0];
+      mapSearch.flyTo({ center: [parseFloat(lon), parseFloat(lat)], zoom: 18 });
+      if(markerSearch) markerSearch.remove();
+      markerSearch = new maplibregl.Marker().setLngLat([parseFloat(lon), parseFloat(lat)]).addTo(mapSearch);
+      document.getElementById('coordBoxSearch').textContent = `Lat: ${lat}, Lng: ${lon}`;
+      document.getElementById('alamatUsahaSearch').value = data[0].display_name;
+    }else{
+      alert('Lokasi tidak ditemukan');
+    }
+  }catch{ alert('Gagal mencari'); }
+});
+
+/* ========= Foto Preview & Modal ========= */
+['fotoUsaha', 'fotoUsahaSearch'].forEach(id => {
+  const input = document.getElementById(id);
+  const preview = document.getElementById(id === 'fotoUsaha' ? 'fotoPreview' : 'fotoPreviewSearch');
+  input.addEventListener('change', function(e){
+    preview.innerHTML = '';
+    [...e.target.files].forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
+        img.style.cursor = 'pointer';
+        img.onclick = () => {
+          document.getElementById('modalImg').src = img.src;
+          document.getElementById('imgModal').style.display = 'flex';
+        };
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+});
+
+document.getElementById('imgModal').onclick = () => document.getElementById('imgModal').style.display = 'none';
 
 /* ========= Forms ========= */
 document.getElementById('formUsaha').addEventListener('submit',async e=>{
@@ -310,6 +565,59 @@ document.getElementById('formUsaha').addEventListener('submit',async e=>{
   });
   alert('Data tersimpan');
   e.target.reset();
+  document.getElementById('fotoPreview').innerHTML = '';
+});
+
+document.getElementById('formSearch').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const files=document.getElementById('fotoUsahaSearch').files;
+  const fotos = await Promise.all([...files].map(f=>fileToBase64(f)));
+  await add(STORE_USAHA,{
+    tgl:new Date().toLocaleString('id-ID'),
+    namaUsaha:document.getElementById('namaUsahaSearch').value,
+    alamat:document.getElementById('alamatUsahaSearch').value,
+    kategori:document.getElementById('kategoriUsahaSearch').value,
+    jam:document.getElementById('jamUsaha').value,
+    produk:document.getElementById('produkUsaha').value,
+    segmen:document.getElementById('segmenUsaha').value,
+    namaPengisi:document.getElementById('namaPengisiSearch').value,
+    unitKerja:document.getElementById('unitPengisiSearch').value,
+    lat:markerSearch?markerSearch.getLngLat().lat:0,
+    lng:markerSearch?markerSearch.getLngLat().lng:0,
+    fotoCount:fotos.length,
+    fotos
+  });
+  alert('Data tersimpan dari pencarian');
+  e.target.reset();
+  document.getElementById('fotoPreviewSearch').innerHTML = '';
+});
+
+/* ========= Auto-Save Draft tiap 15 detik ========= */
+setInterval(() => {
+  const form = document.getElementById('formUsaha');
+  const draft = {
+    namaUsaha: document.getElementById('namaUsaha').value,
+    alamatUsaha: document.getElementById('alamatUsaha').value,
+    kategoriUsaha: document.getElementById('kategoriUsaha').value,
+    jamUsaha: document.getElementById('jamUsaha').value,
+    produkUsaha: document.getElementById('produkUsaha').value,
+    segmenUsaha: document.getElementById('segmenUsaha').value,
+    namaPengisi: document.getElementById('namaPengisi').value,
+    nipPengisi: document.getElementById('nipPengisi').value,
+    unitPengisi: document.getElementById('unitPengisi').value
+  };
+  localStorage.setItem('pitaloka-draft', JSON.stringify(draft));
+}, 15000);
+
+// Load draft saat buka
+window.addEventListener('load', () => {
+  const draft = JSON.parse(localStorage.getItem('pitaloka-draft') || '{}');
+  Object.keys(draft).forEach(k => {
+    if(document.getElementById(k)) document.getElementById(k).value = draft[k];
+  });
+  // Tampilkan toast saat halaman dimuat
+  document.getElementById('toastHover').classList.add('show');
+  document.getElementById('toastHover3').classList.add('show');
 });
 
 /* ========= Export / Lihat ========= */
@@ -328,9 +636,46 @@ async function exportExcel(){
   XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
   XLSX.writeFile(wb,"Pitaloka_Data.xlsx");
 }
-const fileToBase64=f=>new Promise((res,rej)=>{
-  const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(f);
-});
+
+/* ========= Share File (.xlsx) ========= */
+async function shareData(){
+  const usaha = await getAll(STORE_USAHA);
+  const poi = await getAll(STORE_POI);
+  const wb = XLSX.utils.book_new();
+  const wsUsaha = XLSX.utils.json_to_sheet(usaha);
+  const wsPoi = XLSX.utils.json_to_sheet(poi);
+  XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
+  XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
+  
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const file = new File([blob], "Pitaloka_Data.xlsx", { type: blob.type });
+
+  if ('share' in navigator) {
+    try {
+      await navigator.share({
+        title: 'Data Pitaloka',
+        text: 'Berikut data lokasi usaha dari Pitaloka.',
+        files: [file]
+      });
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        fallbackShare(file);
+      }
+    }
+  } else {
+    fallbackShare(file);
+  }
+}
+
+function fallbackShare(file) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 /* ========= POI 500 m ========= */
 async function fetchPOI(){
@@ -366,8 +711,32 @@ function haversine(lat1,lon1,lat2,lon2){
   return 2*R*Math.asin(Math.sqrt(a))/1000;
 }
 
-/* Tampilkan toastHover saat load */
-window.addEventListener('load',()=>document.getElementById('toastHover').classList.add('show'));
+/* ========= Location Toggle Button ========= */
+function toggleLocation(){
+  const btn = document.getElementById('locationBtn');
+  if(btn.textContent.includes('OFF')){
+    btn.textContent = '📍 Location: ON';
+    btn.classList.remove('off');
+    document.getElementById('toastHover').classList.add('show');
+  }else{
+    btn.textContent = '📍 Location: OFF';
+    btn.classList.add('off');
+    document.getElementById('toastHover').classList.remove('show');
+  }
+}
+
+function toggleLocation3(){
+  const btn = document.getElementById('locationBtn3');
+  if(btn.textContent.includes('OFF')){
+    btn.textContent = '📍 Location: ON';
+    btn.classList.remove('off');
+    document.getElementById('toastHover3').classList.add('show');
+  }else{
+    btn.textContent = '📍 Location: OFF';
+    btn.classList.add('off');
+    document.getElementById('toastHover3').classList.remove('show');
+  }
+}
 </script>
 </body>
 </html>
