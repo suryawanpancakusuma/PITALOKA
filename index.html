@@ -25,9 +25,9 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
-    /* 🌅 Background: Pantai Kelingking, Nusa Penida */
+    /* 🌊 Background: Laut Bali yang Jernih (Biru Kehijauan) */
     body {
-      background: url('https://images.unsplash.com/photo-1596394722345-5f513a8e3f5a?w=1600&q=85') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
       min-height: 100vh;
@@ -35,13 +35,13 @@
       overflow-x: hidden;
     }
 
-    /* Overlay transparan agar teks terbaca */
+    /* Overlay lebih terang agar latar terlihat */
     .overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(135deg, 
-        rgba(0,0,0,0.5), 
-        rgba(30,10,10,0.6)
+        rgba(0,0,0,0.4), 
+        rgba(30,10,10,0.5)
       );
       z-index: 0;
     }
@@ -114,41 +114,9 @@
       box-shadow: 0 6px 20px rgba(255,215,0,0.6);
     }
 
-    /* Tab Navigation */
-    .tabs {
-      display: flex;
-      margin: 15px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-    }
-
-    .tab {
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      cursor: pointer;
-      border-radius: 10px 10px 0 0;
-      margin-right: 5px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
-
-    .tab.active {
-      background: var(--bali-orange);
-      color: white;
-    }
-
-    /* Tab Content */
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
     /* Peta di bawah judul */
     .map-container {
-      height: 300px;
+      height: 350px;
       border-radius: 12px;
       overflow: hidden;
       margin: 15px 0;
@@ -334,6 +302,26 @@
       font-size: 0.95rem;
     }
 
+    /* 📲 QR Code Section */
+    .qrcode-section {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .qrcode-section img {
+      width: 180px;
+      height: 180px;
+      border: 4px solid #FFD700;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .qrcode-section p {
+      font-size: 0.9rem;
+      margin-top: 10px;
+      color: rgba(255,255,255,0.9);
+    }
+
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.6); }
       70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
@@ -371,69 +359,53 @@
       <div class="datetime" id="datetime">Sedang memuat waktu...</div>
     </header>
 
-    <!-- Tab Navigation -->
-    <div class="tabs">
-      <div class="tab active" id="tabUsaha">📍 Lokasi Usaha</div>
-      <div class="tab" id="tabPOI">🔍 POI Terdekat</div>
+    <!-- 🔘 TOMBOL LOKASI DI ATAS PETA -->
+    <div class="action-row">
+      <button id="getLocation" class="btn-location">📍 Dapatkan Lokasi (GPS/EXIF)</button>
     </div>
 
-    <!-- Tab 1: Lokasi Usaha -->
-    <div class="tab-content active" id="contentUsaha">
-      <!-- 🔘 TOMBOL LOKASI DI ATAS PETA -->
-      <div class="action-row">
-        <button id="getLocation" class="btn-location">📍 Dapatkan Lokasi (GPS/EXIF)</button>
-      </div>
-
-      <!-- 🗺️ Peta -->
-      <div class="map-container">
-        <div id="map"></div>
-      </div>
-
-      <div class="info-box">
-        <strong>🎯 Cara Pilih Lokasi:</strong>
-        <br>• Klik peta untuk pilih lokasi
-        <br>• Seret pin untuk presisi tinggi
-        <br>• Ambil foto → lokasi dari EXIF
-      </div>
-
-      <div class="form-group"><label>Nama Usaha</label><input type="text" id="namaUsaha" required /></div>
-      <div class="form-group"><label>Pemilik</label><input type="text" id="pemilik" required /></div>
-      <div class="form-group"><label>Alamat</label><textarea id="alamat" readonly placeholder="Klik tombol lokasi atau peta"></textarea></div>
-      <div class="form-group"><label>Jenis Usaha</label>
-        <select id="jenisUsaha">
-          <option value="">Pilih...</option>
-          <option value="kuliner">Kuliner</option>
-          <option value="fashion">Fashion</option>
-          <option value="jasa">Jasa</option>
-          <option value="retail">Retail</option>
-          <option value="kerajinan">Kerajinan</option>
-          <option value="lainnya">Lainnya</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Jam Operasional</label><input type="text" id="jamOperasional" placeholder="08:00 - 20:00" /></div>
-      <div class="form-group"><label>Produk/Jasa</label><textarea id="produk"></textarea></div>
-      <div class="form-group">
-        <label>Foto Lokasi (max 5)</label>
-        <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple />
-        <div class="image-preview" id="imagePreview"></div>
-      </div>
-      <button id="saveData">💾 Simpan Data</button>
-      <button id="exportData" disabled>📤 Ekspor Data Usaha</button>
-      <button id="viewAllData">📋 Lihat Semua Data</button>
+    <!-- 🗺️ Peta -->
+    <div class="map-container">
+      <div id="map"></div>
     </div>
 
-    <!-- Tab 2: POI Terdekat -->
-    <div class="tab-content" id="contentPOI">
-      <div class="info-box">
-        <strong>🔍 POI dalam Radius 100m</strong>
-        <br>• Klik "Ambil POI" di tab Lokasi Usaha
-        <br>• Data akan muncul di sini
-      </div>
+    <!-- 🔀 Kontrol Layer -->
+    <div class="info-box">
+      <strong>🗺️ Peta:</strong> Pilih tampilan
+      <br>• <strong>Peta Jalan</strong>: detail jalan, nama jalan
+      <br>• <strong>Satelit</strong>: tampilan udara, cocok untuk area terpencil
+    </div>
 
-      <button id="fetchPOI" style="background:#FF6347;">🔍 Ambil POI Radius 100m</button>
-      <div id="poiList" style="margin:15px 0; font-size:0.95rem; color:#fff; line-height:1.6;"></div>
-      <button id="exportPOI" disabled>📤 Ekspor POI (POIxx.xlsx)</button>
-      <button id="viewAllDataPOI">📋 Lihat Semua Data</button>
+    <div class="form-group"><label>Nama Usaha</label><input type="text" id="namaUsaha" required /></div>
+    <div class="form-group"><label>Pemilik</label><input type="text" id="pemilik" required /></div>
+    <div class="form-group"><label>Alamat</label><textarea id="alamat" readonly placeholder="Klik tombol lokasi atau peta"></textarea></div>
+    <div class="form-group"><label>Jenis Usaha</label>
+      <select id="jenisUsaha">
+        <option value="">Pilih...</option>
+        <option value="kuliner">Kuliner</option>
+        <option value="fashion">Fashion</option>
+        <option value="jasa">Jasa</option>
+        <option value="retail">Retail</option>
+        <option value="kerajinan">Kerajinan</option>
+        <option value="lainnya">Lainnya</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Jam Operasional</label><input type="text" id="jamOperasional" placeholder="08:00 - 20:00" /></div>
+    <div class="form-group"><label>Produk/Jasa</label><textarea id="produk"></textarea></div>
+    <div class="form-group">
+      <label>Foto Lokasi (max 5)</label>
+      <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple />
+      <div class="image-preview" id="imagePreview"></div>
+    </div>
+    <button id="fetchPOI">🔍 Ambil POI Radius 100m</button>
+    <button id="saveData">💾 Simpan Data</button>
+    <button id="exportData" disabled>📤 Ekspor Data Usaha</button>
+    <button id="viewAllData">📋 Lihat Semua Data</button>
+
+    <!-- 📲 QR Code Akses Cepat -->
+    <div class="qrcode-section">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://suryawanpancakusuma.github.io/PITALOKA/" alt="QR Code Pitaloka">
+      <p>📲 Scan untuk akses cepat ke Pitaloka</p>
     </div>
 
     <div class="info-box">
@@ -464,7 +436,6 @@
       }, 3000);
     }
 
-    // Tampilkan toast 3 kali
     setTimeout(showToast, 1000);
     setTimeout(() => document.getElementById('toast').classList.remove('show'), 10000);
     setTimeout(() => document.getElementById('toast').style.display = 'none', 10500);
@@ -502,11 +473,33 @@
     let poiData = [];
     let isDataSaved = false;
 
-    // === INIT MAP ===
+    // === INIT MAP dengan LAYER SATELIT & KONTROL ===
     function initMap(lat, lng) {
       if (map) map.remove();
-      map = L.map('map').setView([lat, lng], 18);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+
+      // Base Layers
+      const roadMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      });
+
+      const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri, Maxar, Earthstar Geographics'
+      });
+
+      // Inisialisasi peta
+      map = L.map('map', {
+        layers: [roadMap]
+      }).setView([lat, lng], 19); // Zoom maksimal
+
+      // Tambahkan layer
+      const baseMaps = {
+        "Peta Jalan": roadMap,
+        "Satelit": satellite
+      };
+
+      L.control.layers(baseMaps).addTo(map);
+
+      // Marker
       marker = L.marker([lat, lng], { draggable: true }).addTo(map);
       marker.on('dragend', onMarkerDrag);
       onMarkerDrag();
@@ -591,28 +584,10 @@
           'Foto': imagesData.length > 0 ? 'Ya' : 'Tidak'
         }));
         alert(`✅ Ditemukan ${poiData.length} usaha dalam radius 100m`);
-        updatePOIList();
-        document.getElementById('exportPOI').disabled = false;
       } catch (e) {
         alert('Gagal ambil POI. Cek koneksi internet.');
       }
     });
-
-    // === UPDATE POI LIST ===
-    function updatePOIList() {
-      const list = document.getElementById('poiList');
-      if (poiData.length === 0) {
-        list.innerHTML = '<p style="color:rgba(255,255,255,0.7)">Belum ada POI. Kembali ke tab Lokasi Usaha dan klik "Ambil POI".</p>';
-        return;
-      }
-      list.innerHTML = poiData.map(p => `
-        <div style="padding:10px; margin:8px 0; background:rgba(255,255,255,0.1); border-radius:8px;">
-          <strong>${p['Nama Usaha']}</strong><br>
-          <small>${p['Alamat']}</small><br>
-          <span style="font-size:0.9rem; color:#FFD700;">${p['Jenis']}</span>
-        </div>
-      `).join('');
-    }
 
     // === UPLOAD FOTO ===
     document.getElementById('fotoInput').addEventListener('change', function(e) {
@@ -716,11 +691,8 @@
       setTimeout(() => document.body.removeChild(toast), 3500);
     }
 
-    // === LIHAT SEMUA DATA (di kedua tab) ===
-    document.getElementById('viewAllData').addEventListener('click', showAllData);
-    document.getElementById('viewAllDataPOI').addEventListener('click', showAllData);
-
-    function showAllData() {
+    // === LIHAT SEMUA DATA ===
+    document.getElementById('viewAllData').addEventListener('click', () => {
       const allData = JSON.parse(localStorage.getItem('pitalokaData') || '[]');
       if (allData.length === 0) {
         alert('Belum ada data yang disimpan.');
@@ -754,7 +726,7 @@
       modal.querySelector('.close-btn').addEventListener('click', () => {
         document.body.removeChild(modal);
       });
-    }
+    });
 
     // === EKSPOR DATA USAHA ===
     document.getElementById('exportData').addEventListener('click', () => {
@@ -797,22 +769,6 @@
       XLSX.writeFile(wb, filename);
     });
 
-    // === TAB NAVIGATION ===
-    document.getElementById('tabUsaha').addEventListener('click', () => {
-      document.querySelector('.tab.active').classList.remove('active');
-      document.getElementById('tabUsaha').classList.add('active');
-      document.querySelector('.tab-content.active').classList.remove('active');
-      document.getElementById('contentUsaha').classList.add('active');
-    });
-
-    document.getElementById('tabPOI').addEventListener('click', () => {
-      document.querySelector('.tab.active').classList.remove('active');
-      document.getElementById('tabPOI').classList.add('active');
-      document.querySelector('.tab-content.active').classList.remove('active');
-      document.getElementById('contentPOI').classList.add('active');
-      updatePOIList();
-    });
-
     // === SERVICE WORKER ===
     if ('serviceWorker' in navigator) {
       const swScript = `
@@ -848,7 +804,6 @@
     updateGreeting();
     updateDateTime();
     initMap(currentLat, currentLng);
-    updatePOIList(); // Inisialisasi list POI
   </script>
 </body>
 </html>
