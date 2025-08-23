@@ -1,905 +1,310 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pitaloka - Pengisian Data Lokasi Usaha</title>
-  <meta name="description" content="Aplikasi lokal untuk pendataan usaha - akurasi tinggi, 100% offline" />
-
-  <!-- Embed Manifest JSON (inline base64) -->
-  <link rel="manifest" href="application/json;base64,ewogICJuYW1lIjogIlBpdGFsb2thIiwKICAic2hvcnRfbmFtZSI6ICJQaXRhbG9rYSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX2NvbG9yIjogIiNE MjY5MUUiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8yNS8yNTY1Ny5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <style>
-    :root {
-      --bali-orange: #D2691E;
-      --bali-yellow: #FFD700;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    /* 🌊 Background: Laut Bali yang Jernih (Biru Kehijauan) */
-    body {
-      background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Overlay lebih terang agar latar terlihat */
-    .overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, 
-        rgba(0,0,0,0.4), 
-        rgba(30,10,10,0.5)
-      );
-      z-index: 0;
-    }
-
-    .container {
-      position: relative;
-      z-index: 2;
-      padding: 12px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-    }
-
-    h1 {
-      font-size: 1.9rem;
-      color: var(--bali-yellow);
-    }
-
-    /* Subtitle: Pengisian Data Lokasi Usaha */
-    .subtitle {
-      font-size: 1.1rem;
-      color: var(--bali-yellow);
-      margin: 5px 0 15px;
-      font-weight: normal;
-      letter-spacing: 0.5px;
-    }
-
-    /* Real-time Date & Time */
-    .datetime {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.9);
-      margin: 5px 0 10px;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
-    }
-
-    /* Greeting */
-    .greeting {
-      font-size: 1.1rem;
-      color: rgba(255,255,255,0.95);
-      margin: 5px 0 15px;
-      font-style: italic;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
-    }
-
-    /* Tab Navigation */
-    .tabs {
-      display: flex;
-      margin: 15px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-    }
-
-    .tab {
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      cursor: pointer;
-      border-radius: 10px 10px 0 0;
-      margin-right: 5px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
-
-    .tab.active {
-      background: var(--bali-orange);
-      color: white;
-    }
-
-    /* Tab Content */
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Tombol Lokasi di atas peta */
-    .action-row {
-      text-align: center;
-      margin: 10px 0 15px;
-    }
-
-    .btn-location {
-      background: #FFD700;
-      color: #000;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 15px rgba(255,215,0,0.4);
-      transition: all 0.3s ease;
-      display: inline-block;
-    }
-
-    .btn-location:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255,215,0,0.6);
-    }
-
-    /* Peta di bawah judul */
-    .map-container {
-      height: 350px;
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 15px 0;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: var(--bali-yellow);
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    button {
-      background: var(--bali-orange);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-      width: 100%;
-      font-weight: bold;
-    }
-
-    .image-preview {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .image-preview img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 2px solid #4169E1;
-    }
-
-    .info-box {
-      background: rgba(0,0,0,0.5);
-      padding: 12px;
-      border-radius: 8px;
-      margin: 10px 0;
-      font-size: 0.9rem;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-    }
-
-    /* 💠 Watermark Anti-Jiplak - Kontras Tinggi */
-    .watermark {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(360deg);
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: rgba(255, 215, 0, 0.15);
-      text-shadow: 
-        0 0 5px rgba(0,0,0,0.5),
-        0 0 10px rgba(0,0,0,0.3);
-      pointer-events: none;
-      z-index: 1;
-      animation: rotate 12s linear infinite, float 4s ease-in-out infinite;
-      background: repeating-linear-gradient(
-        45deg, 
-        transparent, 
-        transparent 10px, 
-        rgba(255, 215, 0, 0.05) 10px, 
-        rgba(255, 215, 0, 0.05) 20px
-      );
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* 🔔 Toast Notification - Eye Catching */
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9);
-      color: #FFD700;
-      padding: 16px 30px;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: bold;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      text-align: center;
-      max-width: 90%;
-      border: 2px solid #FFD700;
-      animation: pulse 1.5s infinite;
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-
-    /* 📋 Modal Lihat Semua Data */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 9998;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto;
-    }
-
-    .modal-content {
-      background: rgba(255,255,255,0.95);
-      color: #000;
-      width: 90%;
-      max-width: 600px;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin: 20px;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .modal-header h3 {
-      color: #D2691E;
-      margin: 0;
-    }
-
-    .close-btn {
-      background: #D2691E;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .data-item {
-      padding: 12px;
-      margin-bottom: 10px;
-      background: #f9f9f9;
-      border-radius: 10px;
-      border-left: 4px solid #D2691E;
-    }
-
-    .data-item p {
-      margin: 4px 0;
-      font-size: 0.95rem;
-    }
-
-    /* 📲 QR & Barcode Section */
-    .qrcode-section {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .qrcode-section img {
-      width: 180px;
-      height: 180px;
-      border: 4px solid #FFD700;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      margin: 10px 0;
-    }
-
-    .qrcode-section p {
-      font-size: 0.9rem;
-      margin: 5px 0;
-      color: rgba(255,255,255,0.9);
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.6); }
-      70% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
-      100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
-    }
-
-    @keyframes rotate { 
-      0% { transform: translate(-50%, -50%) rotate(0deg); } 
-      100% { transform: translate(-50%, -50%) rotate(360deg); } 
-    }
-    @keyframes float { 
-      0%, 100% { transform: translate(-50%, -50%) translateY(0); } 
-      50% { transform: translate(-50%, -50%) translateY(-20px); } 
-    }
-  </style>
+<meta charset="utf-8"/>
+<title>Pitaloka Dual-Tab | PWA Multi-Layer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#00796b"/>
+<link rel="manifest" href="data:application/manifest+json,{
+  &quot;name&quot;:&quot;Pitaloka Dual-Tab Multi-Layer&quot;,
+  &quot;short_name&quot;:&quot;Pitaloka&quot;,
+  &quot;start_url&quot;:&quot;./pitaloka-dual.html&quot;,
+  &quot;display&quot;:&quot;standalone&quot;,
+  &quot;background_color&quot;:&quot;#ffffff&quot;,
+  &quot;theme_color&quot;:&quot;#00796b&quot;
+}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+ html,body{margin:0;padding:0;height:100%;font-family:system-ui,Arial;background:url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=60') center/cover fixed;color:#222}
+ .tabs{display:flex;background:#00796b;color:#fff}
+ .tabs button{flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff}
+ .tabs button.active{background:#004c40;font-weight:bold}
+ .tab-content{display:none;padding:12px}
+ .tab-content.active{display:block}
+ #map1{height:50vh;border:1px solid #00796b;border-radius:6px;margin-bottom:10px}
+ label{display:block;margin:6px 0 2px;font-size:.9em}
+ input,textarea,select{width:100%;padding:6px;border-radius:4px;border:1px solid #aaa}
+ button.primary{background:#00796b;color:#fff;border:none;padding:8px 16px;border-radius:4px;margin-top:6px}
+ #layerControl{background:#fff;padding:4px 8px;border-radius:4px;margin-bottom:6px;display:inline-block;font-size:.85em}
+ #poiListWrapper{background:rgba(0,0,0,0.75);border-radius:8px;padding:10px;margin-top:8px;color:#fff}
+ #poiList{max-height:60vh;overflow:auto}
+ .poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff}
+ .poiItem h4{margin:2px 0;color:#fff}
+ .poiItem p{margin:2px 0;font-size:.85em;color:#eee}
+ #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:12px 18px;border-radius:4px;z-index:9999;opacity:0;transition:opacity .4s;cursor:pointer}
+ #toast.show{opacity:1}
+ #watermark{
+   position:fixed;z-index:999;top:50%;left:50%;
+   font-size:2.2em;font-weight:bold;color:rgba(255,255,255,.55);
+   animation:spin 6s linear infinite,blink 1.2s infinite;
+   pointer-events:none;transform:translate(-50%,-50%);
+ }
+ @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+ @keyframes blink{0%,100%{opacity:.55}50%{opacity:0}}
+</style>
 </head>
 <body>
+<div id="watermark">suryawanp</div>
 
-  <!-- 💠 Watermark Anti-Jiplak -->
-  <div class="watermark">suryawanp</div>
+<div class="tabs">
+  <button id="tab1Btn" class="active">Form Lokasi Usaha</button>
+  <button id="tab2Btn">POI Sekitar (500 m)</button>
+</div>
 
-  <div class="overlay"></div>
-
-  <!-- 🔔 Toast Notification (3x muncul) -->
-  <div class="toast" id="toast">
-    📍 Izinkan akses lokasi untuk akurasi tinggi!
-    <br><small>Gunakan tombol di bawah untuk mulai</small>
+<!-- TAB 1 -->
+<div id="tab1" class="tab-content active">
+  <h3>📍 Formulir Lokasi Usaha / POI Inti</h3>
+  <div id="layerControl">
+    <label>Pilih layer peta:
+      <select id="baseLayers">
+        <option value="osm">OpenStreetMap</option>
+        <option value="carto">CartoDB Positron</option>
+        <option value="esri">Esri Satellite</option>
+      </select>
+    </label>
   </div>
+  <div id="map1"></div>
 
-  <div class="container">
-    <header>
-      <h1>📍 Pitaloka</h1>
-      <div class="subtitle">Pengisian Data Lokasi Usaha</div>
-      <div class="greeting" id="greeting">Sedang memuat salam...</div>
-      <div class="datetime" id="datetime">Sedang memuat waktu...</div>
-    </header>
+  <form id="formUsaha">
+    <label>Nama Usaha / POI<input type="text" id="namaUsaha" required></label>
+    <label>Alamat Lengkap<textarea id="alamatUsaha" rows="2" readonly></textarea></label>
+    <label>Kategori
+      <select id="kategoriUsaha">
+        <option>Makanan & Minuman</option><option>Pariwisata</option>
+        <option>Perdagangan</option><option>Jasa</option><option>Lainnya</option>
+      </select>
+    </label>
+    <label>Jam Buka – Tutup<input type="text" id="jamUsaha" placeholder="08:00-22:00"></label>
+    <label>Produk/Jasa<textarea id="produkUsaha" rows="2"></textarea></label>
+    <label>Segmentasi Konsumen<input type="text" id="segmenUsaha"></label>
+    <label>Foto<input type="file" id="fotoUsaha" accept="image/*" multiple capture="environment"></label>
+    <label>Nama Pengisi<input type="text" id="namaPengisi" required></label>
+    <label>NIP<input type="text" id="nipPengisi"></label>
+    <label>Unit Kerja<input type="text" id="unitPengisi"></label>
+    <button type="submit" class="primary">💾 Simpan & Tambahkan ke Excel</button>
+  </form>
+  <button class="primary" onclick="lihatData()">📄 Lihat Data Tersimpan</button>
+  <button class="primary" onclick="exportExcel()">📤 Unduh Semua Data (.xlsx)</button>
+  <div id="listData" style="margin-top:10px;font-size:.85em"></div>
+</div>
 
-    <!-- Tab Navigation -->
-    <div class="tabs">
-      <div class="tab active" id="tabUsaha">📍 Lokasi Usaha</div>
-      <div class="tab" id="tabPOI">🔍 POI Terdekat</div>
-    </div>
-
-    <!-- Tab 1: Lokasi Usaha -->
-    <div class="tab-content active" id="contentUsaha">
-      <!-- 🔘 TOMBOL LOKASI DI ATAS PETA -->
-      <div class="action-row">
-        <button id="getLocation" class="btn-location">📍 Dapatkan Lokasi (GPS/EXIF)</button>
-      </div>
-
-      <!-- 🗺️ Peta -->
-      <div class="map-container">
-        <div id="map"></div>
-      </div>
-
-      <div class="info-box">
-        <strong>🎯 Cara Pilih Lokasi:</strong>
-        <br>• Klik peta untuk pilih lokasi
-        <br>• Seret pin untuk presisi tinggi
-        <br>• Ambil foto → lokasi dari EXIF
-      </div>
-
-      <div class="form-group"><label>Nama Usaha</label><input type="text" id="namaUsaha" required /></div>
-      <div class="form-group"><label>Pemilik</label><input type="text" id="pemilik" required /></div>
-      <div class="form-group"><label>Alamat</label><textarea id="alamat" readonly placeholder="Klik tombol lokasi atau peta"></textarea></div>
-      <div class="form-group"><label>Jenis Usaha</label>
-        <select id="jenisUsaha">
-          <option value="">Pilih...</option>
-          <option value="kuliner">Kuliner</option>
-          <option value="fashion">Fashion</option>
-          <option value="jasa">Jasa</option>
-          <option value="retail">Retail</option>
-          <option value="kerajinan">Kerajinan</option>
-          <option value="lainnya">Lainnya</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Jam Operasional</label><input type="text" id="jamOperasional" placeholder="08:00 - 20:00" /></div>
-      <div class="form-group"><label>Produk/Jasa</label><textarea id="produk"></textarea></div>
-      <div class="form-group">
-        <label>Foto Lokasi (max 5)</label>
-        <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple />
-        <div class="image-preview" id="imagePreview"></div>
-      </div>
-      <button id="saveData">💾 Simpan Data</button>
-      <button id="exportData" disabled>📤 Ekspor Data Usaha</button>
-      <button id="viewAllData">📋 Lihat Semua Data</button>
-    </div>
-
-    <!-- Tab 2: POI Terdekat -->
-    <div class="tab-content" id="contentPOI">
-      <div class="info-box">
-        <strong>🔍 POI dalam Radius 100m</strong>
-        <br>• Klik "Ambil POI" di tab Lokasi Usaha
-        <br>• Data akan muncul di sini
-      </div>
-
-      <button id="fetchPOI" style="background:#FF6347;">🔍 Ambil POI Radius 100m</button>
-      <div id="poiList" style="margin:15px 0; font-size:0.95rem; color:#fff; line-height:1.6;"></div>
-      <button id="exportPOI" disabled>📤 Ekspor POI (POIxx.xlsx)</button>
-      <button id="viewAllDataPOI">📋 Lihat Semua Data</button>
-    </div>
-
-    <!-- 📲 QR & Barcode Section -->
-    <div class="qrcode-section">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://suryawanpancakusuma.github.io/PITALOKA/&margin=1&ecc=M" alt="QR Code Pitaloka">
-      <p>📲 Scan untuk akses cepat ke Pitaloka</p>
-      
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=081632105566&margin=1&ecc=M" alt="Contact WA">
-      <p>📞 Teknis: 081632105566 (Suryawan)</p>
-    </div>
-
-    <div class="info-box">
-      <strong>💡 Tips:</strong>
-      <br>• Zoom peta hingga level bangunan
-      <br>• Seret pin untuk akurasi sub-10 meter
-      <br>• Izinkan lokasi saat diminta
-    </div>
-
-    <footer>&copy; 2025 Pitaloka | 100% Lokal • Oleh suryawanp</footer>
+<!-- TAB 2 -->
+<div id="tab2" class="tab-content">
+  <h3 style="color:#fff;text-shadow:1px 1px 2px #000">🧭 POI Sekitar (500 m)</h3>
+  <div id="poiListWrapper">
+    <div id="poiList">Memuat POI...</div>
   </div>
+  <button class="primary" onclick="simpanPoiToExcel()">💾 Simpan POI ke Excel</button>
+  <button class="primary" onclick="lihatData()">📄 Lihat Data Tersimpan</button>
+  <button class="primary" onclick="exportExcel()">📤 Unduh Semua Data (.xlsx)</button>
+</div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- SheetJS untuk Excel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- EXIF.js untuk baca lokasi dari foto -->
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+<!-- Toast izin lokasi -->
+<div id="toast" onclick="getLocation()">📌 Klik untuk aktifkan GPS & perbolehkan akses lokasi presisi</div>
 
-  <script>
-    // === TAMPILKAN TOAST 3x dengan jeda ===
-    function showToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(showToast, 3000);
-      }, 3000);
-    }
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+/* ========= Service Worker ========= */
+if('serviceWorker' in navigator){
+  const swCode = `
+self.addEventListener('install',e=>e.waitUntil(
+  caches.open('pitaloka-v1').then(c=>c.addAll([
+    './pitaloka-dual.html',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+    'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js'
+  ]))
+));
+self.addEventListener('fetch',e=>{
+  e.respondWith(
+    caches.match(e.request).then(r=>r||fetch(e.request))
+  );
+});`;
+  const blob = new Blob([swCode],{type:"text/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(blob));
+}
 
-    setTimeout(showToast, 1000);
-    setTimeout(() => document.getElementById('toast').classList.remove('show'), 10000);
-    setTimeout(() => document.getElementById('toast').style.display = 'none', 10500);
+/* ========= IndexedDB ========= */
+const DB_NAME="pitalokaDual", STORE_USAHA="usaha", STORE_POI="poi";
+let db;
+const openDB = ()=>new Promise(res=>{
+  const r = indexedDB.open(DB_NAME,1);
+  r.onupgradeneeded = ()=>{
+    const d = r.result;
+    d.createObjectStore(STORE_USAHA,{keyPath:"id",autoIncrement:true});
+    d.createObjectStore(STORE_POI,{keyPath:"id",autoIncrement:true});
+  };
+  r.onsuccess = ()=>{ db = r.result; res(); };
+});
+openDB();
+const add = (store,data)=>db.transaction(store,"readwrite").objectStore(store).add(data);
+const getAll = store=>new Promise(res=>{
+  const tx = db.transaction(store,"readonly");
+  const arr=[]; tx.objectStore(store).openCursor().onsuccess=e=>{
+    const c=e.target.result; if(c){arr.push(c.value);c.continue();}else res(arr);
+  };
+});
 
-    // === SALAM SESUAI WAKTU ===
-    function updateGreeting() {
-      const now = new Date();
-      const hour = now.getHours();
-      let greeting;
-      if (hour < 10) greeting = 'Selamat Pagi 🌅';
-      else if (hour < 15) greeting = 'Selamat Siang ☀️';
-      else if (hour < 18) greeting = 'Selamat Sore 🌇';
-      else greeting = 'Selamat Malam 🌙';
-      document.getElementById('greeting').textContent = `${greeting}, Pengguna Pitaloka`;
-    }
+/* ========= Toast ========= */
+function toast(msg,clickable=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  if(clickable){ t.style.cursor='pointer'; t.onclick=getLocation; }
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), clickable?8000:3000);
+}
 
-    // === TANGGAL & WAKTU REAL-TIME (Format: DD-MM-YYYY, hh:mm) ===
-    function updateDateTime() {
-      const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const dateString = `${day}-${month}-${year}, ${hours}:${minutes}`;
-      document.getElementById('datetime').textContent = dateString;
-    }
+/* ========= Tab switcher ========= */
+const tabs = document.querySelectorAll('.tab-content');
+const btns = document.querySelectorAll('.tabs button');
+function switchTab(idx){
+  tabs.forEach(t=>t.classList.remove('active'));
+  btns.forEach(b=>b.classList.remove('active'));
+  tabs[idx].classList.add('active');
+  btns[idx].classList.add('active');
+}
+document.getElementById('tab1Btn').onclick = ()=>switchTab(0);
+document.getElementById('tab2Btn').onclick = ()=>switchTab(1);
 
-    setInterval(updateDateTime, 1000);
+/* ========= Multi-layer map ========= */
+const map1 = L.map('map1').setView([0,0],16);
+const layers = {
+  osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}),
+  carto: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB'}),
+  esri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri'})
+};
+layers.osm.addTo(map1);
+document.getElementById('baseLayers').addEventListener('change',e=>{
+  map1.eachLayer(l=>{ if(l!==marker) map1.removeLayer(l); });
+  layers[e.target.value].addTo(map1);
+});
 
-    // === GLOBALS ===
-    let map, marker;
-    let currentLat = -8.409518, currentLng = 115.188919;
-    let imagesData = [];
-    let poiData = [];
-    let isDataSaved = false;
+/* ========= Geolocation ========= */
+let myLat,myLng,marker;
+async function getLocation(){
+  const fallbackIP = async ()=>{
+    try{
+      const ip = await fetch('https://get.geojs.io/v1/ip/geo.json').then(r=>r.json());
+      myLat=parseFloat(ip.latitude); myLng=parseFloat(ip.longitude);
+      map1.setView([myLat,myLng],16);
+      if(marker) map1.removeLayer(marker);
+      marker=L.marker([myLat,myLng]).addTo(map1).bindPopup('Lokasi perkiraan').openPopup();
+      fetchAddress(myLat,myLng,document.getElementById('alamatUsaha'));
+      fetchNearbyPOI(myLat,myLng);
+    }catch{ toast('Gagal fallback IP'); }
+  };
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
+    myLat = pos.coords.latitude; myLng = pos.coords.longitude;
+    map1.setView([myLat,myLng],18);
+    if(marker) map1.removeLayer(marker);
+    marker=L.marker([myLat,myLng]).addTo(map1).bindPopup('Lokasi GPS').openPopup();
+    fetchAddress(myLat,myLng,document.getElementById('alamatUsaha'));
+    fetchNearbyPOI(myLat,myLng);
+  }catch(e){
+    toast('GPS gagal → fallback IP',false); fallbackIP();
+  }
+}
+toast('📌 Klik untuk aktifkan GPS & perbolehkan akses lokasi presisi',true);
 
-    // === INIT MAP dengan LAYER SATELIT & KONTROL ===
-    function initMap(lat, lng) {
-      if (map) map.remove();
+async function fetchAddress(lat,lng,inputEl){
+  try{
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const data = await res.json();
+    inputEl.value = data.display_name || '';
+  }catch{ inputEl.value='-';}
+}
 
-      // Base Layers
-      const roadMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-      });
-
-      const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri, Maxar, Earthstar Geographics'
-      });
-
-      // Inisialisasi peta
-      map = L.map('map', {
-        layers: [roadMap]
-      }).setView([lat, lng], 19); // Zoom maksimal
-
-      // Tambahkan layer
-      const baseMaps = {
-        "Peta Jalan": roadMap,
-        "Satelit": satellite
-      };
-
-      L.control.layers(baseMaps).addTo(map);
-
-      // Marker
-      marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-      marker.on('dragend', onMarkerDrag);
-      onMarkerDrag();
-      map.on('click', function(e) {
-        marker.setLatLng(e.latlng);
-        onMarkerDrag();
-      });
-    }
-
-    function onMarkerDrag() {
-      const { lat, lng } = marker.getLatLng();
-      currentLat = lat;
-      currentLng = lng;
-      reverseGeocode(lat, lng);
-    }
-
-    // === DAPATKAN LOKASI ===
-    document.getElementById('getLocation').addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        alert('Geolocation tidak didukung. Gunakan peta manual.');
-        initMap(currentLat, currentLng);
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude, accuracy } = pos.coords;
-          currentLat = latitude;
-          currentLng = longitude;
-          initMap(latitude, longitude);
-          reverseGeocode(latitude, longitude);
-          alert(`✅ Lokasi ditemukan: ${accuracy.toFixed(1)}m`);
-        },
-        (err) => {
-          initMap(currentLat, currentLng);
-          let msg = 'GPS gagal: ';
-          if (err.code === err.PERMISSION_DENIED) msg += 'Izin ditolak. Gunakan peta manual.';
-          else if (err.code === err.POSITION_UNAVAILABLE) msg += 'Lokasi tidak tersedia. Cek GPS.';
-          else msg += err.message;
-          alert(msg);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
-    });
-
-    // === REVERSE GEOCODING ===
-    async function reverseGeocode(lat, lng) {
-      try {
-        const res = await fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}&lang=id`);
-        const data = await res.json();
-        if (data.features && data.features.length > 0) {
-          document.getElementById('alamat').value = data.features[0].properties.name || data.features[0].properties.osm_value;
-        } else {
-          throw new Error('Photon tidak temukan alamat');
-        }
-      } catch (e) {
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-          const data = await res.json();
-          document.getElementById('alamat').value = data.display_name || 'Lokasi tidak dikenal';
-        } catch (e) {
-          document.getElementById('alamat').value = 'Gagal muat alamat';
-        }
-      }
-    }
-
-    // === AMBIL POI DALAM RADIUS 100m ===
-    document.getElementById('fetchPOI').addEventListener('click', async () => {
-      if (!currentLat || !currentLng) {
-        alert('Dapatkan lokasi dulu!');
-        return;
-      }
-      const query = `[out:json];(node(around:100,${currentLat},${currentLng})[shop];node(around:100,${currentLat},${currentLng})[amenity];);out;`;
-      try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
-        const data = await res.json();
-        poiData = data.elements.map(p => ({
-          'Nama Usaha': p.tags.name || 'Tanpa Nama',
-          'Alamat': p.tags.address || 'Alamat tidak tersedia',
-          'Latitude': p.lat,
-          'Longitude': p.lon,
-          'Jenis': p.tags.shop || p.tags.amenity || 'Lainnya',
-          'Foto': imagesData.length > 0 ? 'Ya' : 'Tidak'
-        }));
-        alert(`✅ Ditemukan ${poiData.length} usaha dalam radius 100m`);
-        updatePOIList();
-        document.getElementById('exportPOI').disabled = false;
-      } catch (e) {
-        alert('Gagal ambil POI. Cek koneksi internet.');
-      }
-    });
-
-    // === UPDATE POI LIST ===
-    function updatePOIList() {
-      const list = document.getElementById('poiList');
-      if (poiData.length === 0) {
-        list.innerHTML = '<p style="color:rgba(255,255,255,0.7)">Belum ada POI. Kembali ke tab Lokasi Usaha dan klik "Ambil POI".</p>';
-        return;
-      }
-      list.innerHTML = poiData.map(p => `
-        <div style="padding:10px; margin:8px 0; background:rgba(255,255,255,0.1); border-radius:8px;">
-          <strong>${p['Nama Usaha']}</strong><br>
-          <small>${p['Alamat']}</small><br>
-          <span style="font-size:0.9rem; color:#FFD700;">${p['Jenis']}</span>
-        </div>
-      `).join('');
-    }
-
-    // === UPLOAD FOTO ===
-    document.getElementById('fotoInput').addEventListener('change', function(e) {
-      const files = Array.from(e.target.files).slice(0, 5);
-      const preview = document.getElementById('imagePreview');
-      preview.innerHTML = ''; imagesData = [];
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800; canvas.height = 600;
-            canvas.getContext('2d').drawImage(img, 0, 0, 800, 600);
-            canvas.toBlob(blob => {
-              imagesData.push({ blob, name: file.name });
-              const imgEl = document.createElement('img');
-              imgEl.src = URL.createObjectURL(blob);
-              preview.appendChild(imgEl);
-              EXIF.getData(file, function() {
-                const lat = EXIF.getTag(this, "GPSLatitude");
-                const lng = EXIF.getTag(this, "GPSLongitude");
-                if (lat && lng) {
-                  const finalLat = convertDMSToDD(lat, EXIF.getTag(this, "GPSLatitudeRef"));
-                  const finalLng = convertDMSToDD(lng, EXIF.getTag(this, "GPSLongitudeRef"));
-                  if (confirm(`Gunakan lokasi dari foto? ${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`)) {
-                    currentLat = finalLat;
-                    currentLng = finalLng;
-                    initMap(finalLat, finalLng);
-                    reverseGeocode(finalLat, finalLng);
-                  }
-                }
-              });
-            }, 'image/jpeg', 0.7);
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    function convertDMSToDD(dms, ref) {
-      const d = dms[0].numerator || dms[0];
-      const m = dms[1].numerator || dms[1] || 0;
-      const s = (dms[2].numerator || dms[2] || 0) / (dms[2].denominator || 1);
-      let dd = d + m / 60 + s / 3600;
-      if (ref === "S" || ref === "W") dd = -dd;
-      return dd;
-    }
-
-    // === SIMPAN DATA ===
-    document.getElementById('saveData').addEventListener('click', () => {
-      const nama = document.getElementById('namaUsaha').value;
-      const pemilik = document.getElementById('pemilik').value;
-      const alamat = document.getElementById('alamat').value;
-      if (!nama || !pemilik || !alamat) {
-        alert('Isi semua data wajib!');
-        return;
-      }
-      isDataSaved = true;
-      document.getElementById('exportData').disabled = false;
-      showSaveToast();
-
-      // Simpan data ke localStorage
-      const allData = JSON.parse(localStorage.getItem('pitalokaData') || '[]');
-      allData.push({
-        nama,
-        pemilik,
-        alamat,
-        jenisUsaha: document.getElementById('jenisUsaha').value,
-        jamOperasional: document.getElementById('jamOperasional').value,
-        produk: document.getElementById('produk').value,
-        latitude: currentLat,
-        longitude: currentLng,
-        timestamp: new Date().toLocaleString(),
-        foto: imagesData.length > 0 ? 'Ya' : 'Tidak'
-      });
-      localStorage.setItem('pitalokaData', JSON.stringify(allData));
-    });
-
-    // === TOAST SUKSES SIMPAN ===
-    function showSaveToast() {
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,128,0,0.95);
-        color: white;
-        padding: 16px 30px;
-        border-radius: 14px;
-        font-size: 1rem;
-        font-weight: bold;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-        z-index: 9999;
-        animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+/* ========= POI ========= */
+async function fetchNearbyPOI(lat,lng){
+  const q = `[out:json][timeout:15];
+(
+  node["amenity"](around:500,${lat},${lng});
+  way["amenity"](around:500,${lat},${lng});
+  relation["amenity"](around:500,${lat},${lng});
+);
+out center;`;
+  try{
+    const res = await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q));
+    const data = await res.json();
+    const list = document.getElementById('poiList'); list.innerHTML='';
+    data.elements.forEach(el=>{
+      const name = el.tags?.name || 'Tanpa nama';
+      const cat = el.tags?.amenity || '-';
+      const ll = el.type==='node'?[el.lat,el.lon]:[el.center.lat,el.center.lon];
+      const dist = (haversine(lat,lng,ll[0],ll[1])*1000).toFixed(0);
+      const div = document.createElement('div');
+      div.className='poiItem';
+      div.innerHTML=`
+        <h4>${name}</h4>
+        <p>Kategori: ${cat} | Jarak: ${dist} m</p>
+        <p>Lat: ${ll[0].toFixed(5)}, Lng: ${ll[1].toFixed(5)}</p>
       `;
-      toast.textContent = '✅ Data berhasil disimpan! Sekarang Anda bisa ekspor.';
-      document.body.appendChild(toast);
-      setTimeout(() => document.body.removeChild(toast), 3500);
-    }
-
-    // === LIHAT SEMUA DATA (di kedua tab) ===
-    document.getElementById('viewAllData').addEventListener('click', showAllData);
-    document.getElementById('viewAllDataPOI').addEventListener('click', showAllData);
-
-    function showAllData() {
-      const allData = JSON.parse(localStorage.getItem('pitalokaData') || '[]');
-      if (allData.length === 0) {
-        alert('Belum ada data yang disimpan.');
-        return;
-      }
-
-      const modal = document.createElement('div');
-      modal.className = 'modal';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>📋 Semua Data Usaha</h3>
-            <button class="close-btn">&times;</button>
-          </div>
-          <div id="dataList">
-            ${allData.map((item, i) => `
-              <div class="data-item">
-                <p><strong>Nama Usaha:</strong> ${item.nama}</p>
-                <p><strong>Pemilik:</strong> ${item.pemilik}</p>
-                <p><strong>Alamat:</strong> ${item.alamat}</p>
-                <p><strong>Lokasi:</strong> ${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</p>
-                <p><strong>Waktu:</strong> ${item.timestamp}</p>
-                <p><strong>Foto:</strong> ${item.foto}</p>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      modal.querySelector('.close-btn').addEventListener('click', () => {
-        document.body.removeChild(modal);
+      div.onclick = ()=>add(STORE_POI,{
+        tgl:new Date().toLocaleString('id-ID'),
+        nama:name, kategori:cat,
+        lat:ll[0], lng:ll[1], jarak:dist+' m'
       });
-    }
-
-    // === EKSPOR DATA USAHA ===
-    document.getElementById('exportData').addEventListener('click', () => {
-      if (!isDataSaved) {
-        alert('Harap simpan data dulu!');
-        return;
-      }
-      const nama = document.getElementById('namaUsaha').value;
-      const pemilik = document.getElementById('pemilik').value;
-      const alamat = document.getElementById('alamat').value;
-      const wb = XLSX.utils.book_new();
-      const formData = {
-        'Nama Usaha': nama,
-        'Pemilik': pemilik,
-        'Alamat': alamat,
-        'Jenis Usaha': document.getElementById('jenisUsaha').value,
-        'Jam Operasional': document.getElementById('jamOperasional').value,
-        'Produk/Jasa': document.getElementById('produk').value,
-        'Latitude': currentLat,
-        'Longitude': currentLng,
-        'Timestamp': new Date().toLocaleString(),
-        'Input By': 'suryawanp'
-      };
-      const ws = XLSX.utils.json_to_sheet([formData]);
-      XLSX.utils.book_append_sheet(wb, ws, 'Data Usaha');
-      XLSX.writeFile(wb, `data_usaha_${Date.now()}.xlsx`);
+      list.appendChild(div);
     });
+  }catch{
+    toast('Gagal ambil POI');
+  }
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371e3, toRad=deg=>deg*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a))/1000;
+}
 
-    // === EKSPOR POI ===
-    document.getElementById('exportPOI').addEventListener('click', () => {
-      if (poiData.length === 0) {
-        alert('Ambil POI dulu!');
-        return;
-      }
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(poiData);
-      XLSX.utils.book_append_sheet(wb, ws, 'POI Terdekat');
-      const now = new Date();
-      const filename = `POI_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.xlsx`;
-      XLSX.writeFile(wb, filename);
-    });
+/* ========= Forms ========= */
+document.getElementById('formUsaha').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const files=document.getElementById('fotoUsaha').files;
+  const fotos = await Promise.all([...files].map(f=>fileToBase64(f)));
+  await add(STORE_USAHA,{
+    tgl:new Date().toLocaleString('id-ID'),
+    namaUsaha:document.getElementById('namaUsaha').value,
+    alamat:document.getElementById('alamatUsaha').value,
+    kategori:document.getElementById('kategoriUsaha').value,
+    jam:document.getElementById('jamUsaha').value,
+    produk:document.getElementById('produkUsaha').value,
+    segmen:document.getElementById('segmenUsaha').value,
+    namaPengisi:document.getElementById('namaPengisi').value,
+    nip:document.getElementById('nipPengisi').value,
+    unitKerja:document.getElementById('unitPengisi').value,
+    lat:myLat,lng:myLng,
+    fotoCount:fotos.length,
+    fotos
+  });
+  toast('Data usaha tersimpan');
+  e.target.reset();
+});
 
-    // === TAB NAVIGATION ===
-    document.getElementById('tabUsaha').addEventListener('click', () => {
-      document.querySelector('.tab.active').classList.remove('active');
-      document.getElementById('tabUsaha').classList.add('active');
-      document.querySelector('.tab-content.active').classList.remove('active');
-      document.getElementById('contentUsaha').classList.add('active');
-    });
-
-    document.getElementById('tabPOI').addEventListener('click', () => {
-      document.querySelector('.tab.active').classList.remove('active');
-      document.getElementById('tabPOI').classList.add('active');
-      document.querySelector('.tab-content.active').classList.remove('active');
-      document.getElementById('contentPOI').classList.add('active');
-      updatePOIList();
-    });
-
-    // === SERVICE WORKER ===
-    if ('serviceWorker' in navigator) {
-      const swScript = `
-        const CACHE_NAME = 'pitaloka-v1';
-        const urlsToCache = [
-          './',
-          'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-          'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-          'https://cdn.jsdelivr.net/npm/exif-js'
-        ];
-        self.addEventListener('install', e => {
-          self.skipWaiting();
-          e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
-        });
-        self.addEventListener('fetch', e => {
-          e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-        });
-        self.addEventListener('activate', e => {
-          e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null))));
-        });
-      `;
-      const blob = new Blob([swScript], { type: 'application/javascript' });
-      const swURL = URL.createObjectURL(blob);
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register(swURL)
-          .then(reg => console.log('SW registered'))
-          .catch(err => console.log('SW failed:', err));
-      });
-    }
-
-    // === INIT ===
-    updateGreeting();
-    updateDateTime();
-    initMap(currentLat, currentLng);
-    updatePOIList(); // Inisialisasi list POI
-  </script>
+/* ========= Export / Lihat ========= */
+async function lihatData(){
+  const [usaha,poi] = await Promise.all([getAll(STORE_USAHA),getAll(STORE_POI)]);
+  const div=document.getElementById('listData'); div.innerHTML='';
+  div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p>${u.namaUsaha} - ${u.alamat}</p>`).join('')+
+                `<h4>Data POI (${poi.length})</h4>`+poi.map(p=>`<p>${p.nama} - ${p.jarak}</p>`).join('');
+}
+async function exportExcel(){
+  const [usaha,poi] = await Promise.all([getAll(STORE_USAHA),getAll(STORE_POI)]);
+  const wb = XLSX.utils.book_new();
+  const wsUsaha = XLSX.utils.json_to_sheet(usaha);
+  const wsPoi   = XLSX.utils.json_to_sheet(poi);
+  XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
+  XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
+  XLSX.writeFile(wb,"Pitaloka_Dual_Data.xlsx");
+}
+async function simpanPoiToExcel(){
+  toast('POI otomatis tersimpan saat Anda klik item di list');
+}
+const fileToBase64=f=>new Promise((res,rej)=>{
+  const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(f);
+});
+</script>
 </body>
 </html>
