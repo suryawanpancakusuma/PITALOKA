@@ -18,13 +18,12 @@
     :root { --bg: #f5f5f5; --text: #222; --input-bg: #fff; --btn-bg: #00796b; }
   }
 
-  /* Latar belakang: Pura Ulun Danu Beratan, dengan overlay tipis untuk kontras teks */
+  /* Latar belakang: Pura Ulun Danu Beratan, dengan overlay tipis */
   html,body{
     margin:0;padding:0;height:100%;font-family:system-ui,Arial;
     background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;
     color: #fff;
   }
-  /* Overlay tipis */
   body::before {
     content: '';
     position: fixed;
@@ -123,6 +122,27 @@
   .search-hint {
     font-size: 0.85em;color: #aaa;margin: 4px 0 8px;text-align: center;
   }
+  /* Lihat Data List */
+  #listData {
+    background: rgba(0,0,0,0.7);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    max-height: 40vh;
+    overflow-y: auto;
+    color: #fff;
+    font-size: 0.9em;
+  }
+  #listData h4 {
+    color: #FFD700;
+    margin-top: 0;
+    border-bottom: 1px solid #555;
+    padding-bottom: 4px;
+  }
+  #listData p {
+    margin: 6px 0;
+    line-height: 1.4;
+  }
 </style>
 </head>
 <body>
@@ -169,7 +189,7 @@
   </form>
   <button class="primary" onclick="lihatData()">📄 Lihat Data</button>
   <button class="primary" onclick="shareData()">📤 Share File (.xlsx)</button>
-  <div id="listData" style="margin-top:10px;font-size:.85em;color:#fff"></div>
+  <div id="listData"></div>
 </div>
 
 <!-- TAB 2 -->
@@ -265,7 +285,6 @@ const openDB = ()=>new Promise((resolve, reject)=>{
   r.onsuccess = ()=>{ db = r.result; resolve(); };
   r.onerror = ()=> reject(r.error);
 });
-// Pastikan DB siap sebelum digunakan
 (async ()=>{ await openDB(); })();
 
 const add = (store,data)=>new Promise((resolve, reject)=>{
@@ -323,7 +342,6 @@ document.getElementById('tab2Btn').onclick = ()=>{ switchTab(1); fetchPOI(); };
 document.getElementById('tab3Btn').onclick = ()=>switchTab(2);
 
 /* ========= Map Utama (Satelit, Zoom 18 max) ========= */
-// Tunggu DOM siap
 window.addEventListener('load', () => {
   requestAnimationFrame(() => {
     map = new maplibregl.Map({
@@ -340,10 +358,8 @@ window.addEventListener('load', () => {
       maxZoom: 18
     });
 
-    // Tambahkan kompas
     map.addControl(new maplibregl.NavigationControl());
 
-    // Tambahkan kontrol layer
     const layerControl = document.createElement('div');
     layerControl.className = 'maplibregl-ctrl';
     layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
@@ -359,7 +375,6 @@ window.addEventListener('load', () => {
       map.getContainer().appendChild(layerControl);
     });
 
-    // Klik peta utama
     map.on('click', (e) => {
       const { lng, lat } = e.lngLat;
       document.getElementById('coordBox').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
@@ -367,8 +382,6 @@ window.addEventListener('load', () => {
       marker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
       document.getElementById('alamatUsaha').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
     });
-
-    // Panggil geolocation
     getLocation();
   });
 });
@@ -453,7 +466,6 @@ async function fetchAddress(lat, lng, inputEl){
 }
 
 /* ========= Map Pencarian (Zoom 18 max) ========= */
-// Inisialisasi peta pencarian
 window.addEventListener('load', () => {
   requestAnimationFrame(() => {
     mapSearch = new maplibregl.Map({
@@ -470,10 +482,8 @@ window.addEventListener('load', () => {
       maxZoom: 18
     });
 
-    // Tambahkan kompas
     mapSearch.addControl(new maplibregl.NavigationControl());
 
-    // Tambahkan kontrol layer
     const layerControl3 = document.createElement('div');
     layerControl3.className = 'maplibregl-ctrl';
     layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
@@ -489,7 +499,6 @@ window.addEventListener('load', () => {
       mapSearch.getContainer().appendChild(layerControl3);
     });
 
-    // Klik peta pencarian
     mapSearch.on('click', (e) => {
       const { lng, lat } = e.lngLat;
       document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
@@ -637,7 +646,7 @@ document.getElementById('formUsaha').addEventListener('submit',async e=>{
     e.target.reset();
     document.getElementById('fotoPreview').innerHTML = '';
   } catch(err) {
-    alert('Gagal simpan data: ' + err.message);
+    alert('Gagal simpan  ' + err.message);
   }
 });
 
@@ -665,7 +674,7 @@ document.getElementById('formSearch').addEventListener('submit',async e=>{
     e.target.reset();
     document.getElementById('fotoPreviewSearch').innerHTML = '';
   } catch(err) {
-    alert('Gagal simpan data: ' + err.message);
+    alert('Gagal simpan  ' + err.message);
   }
 });
 
@@ -697,25 +706,83 @@ window.addEventListener('load', () => {
 /* ========= Export / Lihat ========= */
 async function lihatData(){
   try {
-    await openDB(); // Pastikan DB siap
+    await openDB();
     const usaha = await getAll(STORE_USAHA);
     const div=document.getElementById('listData'); div.innerHTML='';
-    div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p>${u.namaUsaha} - ${u.alamat}</p>`).join('');
+    div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p><strong>${u.namaUsaha}</strong><br>${u.alamat}<br>${u.tgl}</p>`).join('');
   } catch(err) {
     alert('Gagal baca data: ' + err.message);
   }
 }
+
+/* ========= Export Excel dengan Foto di Sel ========= */
 async function exportExcel(){
   try {
     await openDB();
     const usaha = await getAll(STORE_USAHA);
-    const poi = await getAll(STORE_POI);
     const wb = XLSX.utils.book_new();
-    const wsUsaha = XLSX.utils.json_to_sheet(usaha);
+    const ws_data = [];
+    
+    // Header
+    ws_data.push(["No", "Tanggal", "Nama Usaha", "Alamat", "Kategori", "Jam", "Produk", "Segmen", "Pengisi", "NIP", "Unit", "Lat", "Lng", "Foto"]);
+    
+    // Data + Foto
+    usaha.forEach((u, i) => {
+      const row = [
+        i+1,
+        u.tgl,
+        u.namaUsaha,
+        u.alamat,
+        u.kategori,
+        u.jam,
+        u.produk,
+        u.segmen,
+        u.namaPengisi,
+        u.nip,
+        u.unitKerja,
+        u.lat,
+        u.lng,
+        "Foto"
+      ];
+      ws_data.push(row);
+      
+      // Tambahkan foto ke worksheet
+      if(u.fotos && u.fotos.length > 0) {
+        u.fotos.forEach((foto, idx) => {
+          const img = {
+            name: `Foto_${u.id}_${idx}.png`,
+            data: foto.split(',')[1], // base64 tanpa header
+            type: 'png'
+          };
+          const cellRef = XLSX.utils.encode_cell({r: i+1, c: 13});
+          wb.Sheets["Usaha"] = XLSX.utils.aoa_to_sheet(ws_data);
+          wb.Sheets["Usaha"][cellRef] = { t: 's', v: `Foto ${idx+1}` };
+          wb.Sheets["Usaha"].images = wb.Sheets["Usaha"].images || [];
+          wb.Sheets["Usaha"].images.push({
+            name: img.name,
+            data: img.data,
+            type: img.type,
+            position: {
+              type: 'oneCellAnchor',
+              from: { col: 13, row: i+1 },
+              to: { col: 15, row: i+3 },
+              width: 80,
+              height: 80
+            }
+          });
+        });
+      }
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, "Usaha");
+    
+    // Tambahkan POI
+    const poi = await getAll(STORE_POI);
     const wsPoi = XLSX.utils.json_to_sheet(poi);
-    XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
-    XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
-    XLSX.writeFile(wb,"Pitaloka_Data.xlsx");
+    XLSX.utils.book_append_sheet(wb, wsPoi, "POI");
+    
+    XLSX.writeFile(wb, "Pitaloka_Data.xlsx");
   } catch(err) {
     alert('Gagal ekspor Excel: ' + err.message);
   }
@@ -728,10 +795,20 @@ async function shareData(){
     const usaha = await getAll(STORE_USAHA);
     const poi = await getAll(STORE_POI);
     const wb = XLSX.utils.book_new();
-    const wsUsaha = XLSX.utils.json_to_sheet(usaha);
-    const wsPoi = XLSX.utils.json_to_sheet(poi);
-    XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
-    XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
+    const ws_data = [];
+    
+    ws_data.push(["No", "Tanggal", "Nama Usaha", "Alamat", "Kategori", "Jam", "Produk", "Segmen", "Pengisi", "NIP", "Unit", "Lat", "Lng", "Foto"]);
+    
+    usaha.forEach((u, i) => {
+      ws_data.push([
+        i+1, u.tgl, u.namaUsaha, u.alamat, u.kategori, u.jam, u.produk, u.segmen,
+        u.namaPengisi, u.nip, u.unitKerja, u.lat, u.lng, u.fotoCount + " foto"
+      ]);
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, "Usaha");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(poi), "POI");
     
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -753,7 +830,7 @@ async function shareData(){
       fallbackShare(file);
     }
   } catch(err) {
-    alert('Gagal share data: ' + err.message);
+    alert('Gagal share  ' + err.message);
   }
 }
 
