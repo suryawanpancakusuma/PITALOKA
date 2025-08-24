@@ -2,17 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>Pitaloka – Rafflesia</title>
+<title>Pitaloka – Kimi</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#00796b"/>
-<link rel="manifest" href="application/manifest+json,{
-  &quot;name&quot;:&quot;Pitaloka Rafflesia&quot;,
-  &quot;short_name&quot;:&quot;Pitaloka&quot;,
-  &quot;start_url&quot;:&quot;./pitaloka-rafflesia.html&quot;,
-  &quot;display&quot;:&quot;standalone&quot;,
-  &quot;background_color&quot;:&quot;#ffffff&quot;,
-  &quot;theme_color&quot;:&quot;#00796b&quot;
-}">
+<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Pitaloka Kimi&quot;,&quot;short_name&quot;:&quot;Pitaloka&quot;,&quot;start_url&quot;:&quot;./pitaloka-kimi.html&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#00796b&quot;}">
 <link href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -25,16 +18,25 @@
     :root { --bg: #f5f5f5; --text: #222; --input-bg: #fff; --btn-bg: #00796b; }
   }
 
-  /* Latar belakang: Pura Ulun Danu Beratan, tanpa overlay gelap */
+  /* Latar belakang: Pura Ulun Danu Beratan, dengan overlay tipis untuk kontras teks */
   html,body{
     margin:0;padding:0;height:100%;font-family:system-ui,Arial;
     background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;
-    color:var(--text);
+    color: #fff;
   }
+  /* Overlay tipis */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+  }
+
   .header{text-align:center;padding:8px 0;}
   .header h1{
     margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;
-    text-shadow:2px 2px 6px rgba(0,0,0,0.7);
+    text-shadow:2px 2px 6px rgba(0,0,0,0.8);
   }
   .header .sub{
     font-size:1em;color:#FFD700;margin-top:-4px;
@@ -44,7 +46,7 @@
     margin:2px 0;font-size:1.1em;color:#fff;
     text-shadow:1px 1px 4px rgba(0,0,0,0.7);
   }
-  .tabs{display:flex;background:rgba(0,121,107,0.9);color:#fff;}
+  .tabs{display:flex;background:rgba(0,121,107,0.95);color:#fff;}
   .tabs button{
     flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff;
   }
@@ -62,7 +64,7 @@
   }
   label{
     display:block;margin:6px 0 2px;font-size:.9em;
-    color:var(--text);
+    color:#fff;
   }
   input,textarea,select{
     width:100%;padding:6px;border-radius:4px;
@@ -81,12 +83,18 @@
   .poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff;}
   #watermark{
     position:fixed;z-index:999;top:50%;left:50%;
-    font-size:2.2em;font-weight:bold;color:#D2B48C; /* pasir pantai */
-    text-shadow:2px 2px 8px rgba(0,0,0,0.5);
-    opacity:0;pointer-events:none;transform:translate(-50%,-50%);
+    font-size:2.2em;font-weight:bold;color:#D2B48C;
+    text-shadow:2px 2px 8px rgba(0,0,0,0.6);
+    opacity:0;pointer-events:none;transform:translate(-50%,-50%) rotate(0deg);
     transition:opacity 0.8s ease-in-out;
+    animation: spin 6s linear infinite;
   }
-  #watermark.show{opacity:0.7;}
+  #watermark.show{
+    opacity:0.8;
+  }
+  @keyframes spin {
+    to { transform: translate(-50%,-50%) rotate(360deg); }
+  }
   footer{
     text-align:center;padding:8px;font-size:.85em;
     color:#fff;background:rgba(0,0,0,0.5);
@@ -120,7 +128,7 @@
 <body>
 <!-- Header -->
 <div class="header">
-  <h1><span style="font-size:1.3em">🌸</span> PITALOKA <span style="font-size:1.3em">🌸</span></h1>
+  <h1><span style="font-size:1.3em">✨</span> PITALOKA <span style="font-size:1.3em">✨</span></h1>
   <div class="sub">Pengisian Data Lokasi Usaha</div>
   <div class="salam" id="salam">Selamat datang</div>
   <div class="clock" id="clock">--:--, --.--.----</div>
@@ -227,7 +235,7 @@
 
 <!-- Footer -->
 <footer>
-  made with ❤️ by suryawanp - versi Rafflesia
+  made with ❤️ by suryawanp - versi Kimi
 </footer>
 
 <script>
@@ -235,7 +243,7 @@
 if('serviceWorker' in navigator){
   const swCode = `
 self.addEventListener('install',e=>e.waitUntil(
-  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-rafflesia.html']))
+  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-kimi.html']))
 ));
 self.addEventListener('fetch',e=>{
   e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
@@ -247,21 +255,33 @@ self.addEventListener('fetch',e=>{
 /* ========= IndexedDB ========= */
 const DB_NAME="pitalokaFinal", STORE_USAHA="usaha", STORE_POI="poi";
 let db;
-const openDB = ()=>new Promise(res=>{
+const openDB = ()=>new Promise((resolve, reject)=>{
   const r = indexedDB.open(DB_NAME,1);
   r.onupgradeneeded = ()=>{
     const d = r.result;
-    d.createObjectStore(STORE_USAHA,{keyPath:"id",autoIncrement:true});
-    d.createObjectStore(STORE_POI,{keyPath:"id",autoIncrement:true});
+    if(!d.objectStoreNames.contains(STORE_USAHA)) d.createObjectStore(STORE_USAHA,{keyPath:"id",autoIncrement:true});
+    if(!d.objectStoreNames.contains(STORE_POI)) d.createObjectStore(STORE_POI,{keyPath:"id",autoIncrement:true});
   };
-  r.onsuccess = ()=>{ db = r.result; res(); };
+  r.onsuccess = ()=>{ db = r.result; resolve(); };
+  r.onerror = ()=> reject(r.error);
 });
-openDB();
-const add = (store,data)=>db.transaction(store,"readwrite").objectStore(store).add(data);
-const getAll = store=>new Promise(res=>{
+// Pastikan DB siap sebelum digunakan
+(async ()=>{ await openDB(); })();
+
+const add = (store,data)=>new Promise((resolve, reject)=>{
+  const tx = db.transaction(store,"readwrite");
+  tx.oncomplete = ()=> resolve();
+  tx.onerror = ()=> reject(tx.error);
+  tx.objectStore(store).add(data);
+});
+
+const getAll = store=>new Promise((resolve, reject)=>{
   const tx = db.transaction(store,"readonly");
-  const arr=[]; tx.objectStore(store).openCursor().onsuccess=e=>{
-    const c=e.target.result; if(c){arr.push(c.value);c.continue();}else res(arr);
+  const arr=[];
+  tx.onerror = ()=> reject(tx.error);
+  tx.objectStore(store).openCursor().onsuccess=e=>{
+    const c=e.target.result; 
+    if(c){arr.push(c.value);c.continue();}else resolve(arr);
   };
 });
 
@@ -303,46 +323,54 @@ document.getElementById('tab2Btn').onclick = ()=>{ switchTab(1); fetchPOI(); };
 document.getElementById('tab3Btn').onclick = ()=>switchTab(2);
 
 /* ========= Map Utama (Satelit, Zoom 18 max) ========= */
-map = new maplibregl.Map({
-  container: 'map',
-  style: {
-    version: 8,
-    sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
-    layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
-  },
-  center: [118, -2.5],
-  zoom: 4.5,
-  pitch: 0,
-  bearing: 0,
-  maxZoom: 18
-});
+// Tunggu DOM siap
+window.addEventListener('load', () => {
+  requestAnimationFrame(() => {
+    map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+        layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+      },
+      center: [118, -2.5],
+      zoom: 4.5,
+      pitch: 0,
+      bearing: 0,
+      maxZoom: 18
+    });
 
-// Tambahkan kompas
-map.addControl(new maplibregl.NavigationControl());
+    // Tambahkan kompas
+    map.addControl(new maplibregl.NavigationControl());
 
-// Tambahkan kontrol layer
-const layerControl = document.createElement('div');
-layerControl.className = 'maplibregl-ctrl';
-layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
-['osm', 'sat', 'hybrid'].forEach(mode => {
-  const btn = document.createElement('button');
-  btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
-  btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
-  btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
-  btn.onclick = () => setBase(mode);
-  layerControl.appendChild(btn);
-});
-map.on('load', () => {
-  map.getContainer().appendChild(layerControl);
-});
+    // Tambahkan kontrol layer
+    const layerControl = document.createElement('div');
+    layerControl.className = 'maplibregl-ctrl';
+    layerControl.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
+    ['osm', 'sat', 'hybrid'].forEach(mode => {
+      const btn = document.createElement('button');
+      btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
+      btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
+      btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
+      btn.onclick = () => setBase(mode);
+      layerControl.appendChild(btn);
+    });
+    map.on('load', () => {
+      map.getContainer().appendChild(layerControl);
+    });
 
-// Klik peta utama
-map.on('click', (e) => {
-  const { lng, lat } = e.lngLat;
-  document.getElementById('coordBox').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-  if(marker) marker.remove();
-  marker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
-  document.getElementById('alamatUsaha').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+    // Klik peta utama
+    map.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+      document.getElementById('coordBox').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+      if(marker) marker.remove();
+      marker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
+      document.getElementById('alamatUsaha').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+    });
+
+    // Panggil geolocation
+    getLocation();
+  });
 });
 
 /* ========= Layer toggle ========= */
@@ -379,7 +407,7 @@ function getLocation(){
     const pos = navigator.geolocation.getCurrentPosition(pos => {
       const { longitude, latitude, accuracy } = pos.coords;
       if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
-      map.flyTo({
+      if(map) map.flyTo({
         center: [longitude, latitude],
         zoom: 18,
         speed: 1.8,
@@ -425,46 +453,51 @@ async function fetchAddress(lat, lng, inputEl){
 }
 
 /* ========= Map Pencarian (Zoom 18 max) ========= */
-mapSearch = new maplibregl.Map({
-  container: 'mapSearch',
-  style: {
-    version: 8,
-    sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
-    layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
-  },
-  center: [118, -2.5],
-  zoom: 4.5,
-  pitch: 0,
-  bearing: 0,
-  maxZoom: 18
-});
+// Inisialisasi peta pencarian
+window.addEventListener('load', () => {
+  requestAnimationFrame(() => {
+    mapSearch = new maplibregl.Map({
+      container: 'mapSearch',
+      style: {
+        version: 8,
+        sources: { sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256 } },
+        layers: [{ id: 'sat', type: 'raster', source: 'sat' }]
+      },
+      center: [118, -2.5],
+      zoom: 4.5,
+      pitch: 0,
+      bearing: 0,
+      maxZoom: 18
+    });
 
-// Tambahkan kompas
-mapSearch.addControl(new maplibregl.NavigationControl());
+    // Tambahkan kompas
+    mapSearch.addControl(new maplibregl.NavigationControl());
 
-// Tambahkan kontrol layer
-const layerControl3 = document.createElement('div');
-layerControl3.className = 'maplibregl-ctrl';
-layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
-['osm', 'sat', 'hybrid'].forEach(mode => {
-  const btn = document.createElement('button');
-  btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
-  btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
-  btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
-  btn.onclick = () => setBase3(mode);
-  layerControl3.appendChild(btn);
-});
-mapSearch.on('load', () => {
-  mapSearch.getContainer().appendChild(layerControl3);
-});
+    // Tambahkan kontrol layer
+    const layerControl3 = document.createElement('div');
+    layerControl3.className = 'maplibregl-ctrl';
+    layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
+    ['osm', 'sat', 'hybrid'].forEach(mode => {
+      const btn = document.createElement('button');
+      btn.textContent = mode === 'osm' ? 'OSM' : mode === 'sat' ? 'SAT' : 'HYB';
+      btn.title = mode === 'osm' ? 'OpenStreetMap' : mode === 'sat' ? 'Satelit' : 'Hybrid';
+      btn.style.cssText = 'width:30px;height:30px;background:white;border:1px solid #ccc;border-radius:4px;font-size:0.7em;font-weight:bold;cursor:pointer;';
+      btn.onclick = () => setBase3(mode);
+      layerControl3.appendChild(btn);
+    });
+    mapSearch.on('load', () => {
+      mapSearch.getContainer().appendChild(layerControl3);
+    });
 
-// Klik peta pencarian
-mapSearch.on('click', (e) => {
-  const { lng, lat } = e.lngLat;
-  document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-  if(markerSearch) markerSearch.remove();
-  markerSearch = new maplibregl.Marker().setLngLat([lng, lat]).addTo(mapSearch);
-  document.getElementById('alamatUsahaSearch').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+    // Klik peta pencarian
+    mapSearch.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+      document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+      if(markerSearch) markerSearch.remove();
+      markerSearch = new maplibregl.Marker().setLngLat([lng, lat]).addTo(mapSearch);
+      document.getElementById('alamatUsahaSearch').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+    });
+  });
 });
 
 // Layer toggle untuk peta pencarian
@@ -501,7 +534,7 @@ function getLocation3(){
     const pos = navigator.geolocation.getCurrentPosition(pos => {
       const { longitude, latitude, accuracy } = pos.coords;
       if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
-      mapSearch.flyTo({
+      if(mapSearch) mapSearch.flyTo({
         center: [longitude, latitude],
         zoom: 18,
         speed: 1.8,
@@ -531,7 +564,7 @@ document.getElementById('searchInput').addEventListener('keypress', async (e) =>
     const data = await res.json();
     if(data.length > 0){
       const { lat, lon } = data[0];
-      mapSearch.flyTo({ center: [parseFloat(lon), parseFloat(lat)], zoom: 18 });
+      if(mapSearch) mapSearch.flyTo({ center: [parseFloat(lon), parseFloat(lat)], zoom: 18 });
       if(markerSearch) markerSearch.remove();
       markerSearch = new maplibregl.Marker().setLngLat([parseFloat(lon), parseFloat(lat)]).addTo(mapSearch);
       document.getElementById('coordBoxSearch').textContent = `Lat: ${lat}, Lng: ${lon}`;
@@ -583,49 +616,57 @@ document.getElementById('formUsaha').addEventListener('submit',async e=>{
   e.preventDefault();
   const files=document.getElementById('fotoUsaha').files;
   const fotos = await Promise.all([...files].map(f=>fileToBase64(f)));
-  await add(STORE_USAHA,{
-    tgl:new Date().toLocaleString('id-ID'),
-    namaUsaha:document.getElementById('namaUsaha').value,
-    alamat:document.getElementById('alamatUsaha').value,
-    kategori:document.getElementById('kategoriUsaha').value,
-    jam:document.getElementById('jamUsaha').value,
-    produk:document.getElementById('produkUsaha').value,
-    segmen:document.getElementById('segmenUsaha').value,
-    namaPengisi:document.getElementById('namaPengisi').value,
-    nip:document.getElementById('nipPengisi').value,
-    unitKerja:document.getElementById('unitPengisi').value,
-    lat:marker?marker.getLngLat().lat:0,
-    lng:marker?marker.getLngLat().lng:0,
-    fotoCount:fotos.length,
-    fotos
-  });
-  alert('Data tersimpan');
-  e.target.reset();
-  document.getElementById('fotoPreview').innerHTML = '';
+  try {
+    await add(STORE_USAHA,{
+      tgl:new Date().toLocaleString('id-ID'),
+      namaUsaha:document.getElementById('namaUsaha').value,
+      alamat:document.getElementById('alamatUsaha').value,
+      kategori:document.getElementById('kategoriUsaha').value,
+      jam:document.getElementById('jamUsaha').value,
+      produk:document.getElementById('produkUsaha').value,
+      segmen:document.getElementById('segmenUsaha').value,
+      namaPengisi:document.getElementById('namaPengisi').value,
+      nip:document.getElementById('nipPengisi').value,
+      unitKerja:document.getElementById('unitPengisi').value,
+      lat:marker?marker.getLngLat().lat:0,
+      lng:marker?marker.getLngLat().lng:0,
+      fotoCount:fotos.length,
+      fotos
+    });
+    alert('Data tersimpan');
+    e.target.reset();
+    document.getElementById('fotoPreview').innerHTML = '';
+  } catch(err) {
+    alert('Gagal simpan data: ' + err.message);
+  }
 });
 
 document.getElementById('formSearch').addEventListener('submit',async e=>{
   e.preventDefault();
   const files=document.getElementById('fotoUsahaSearch').files;
   const fotos = await Promise.all([...files].map(f=>fileToBase64(f)));
-  await add(STORE_USAHA,{
-    tgl:new Date().toLocaleString('id-ID'),
-    namaUsaha:document.getElementById('namaUsahaSearch').value,
-    alamat:document.getElementById('alamatUsahaSearch').value,
-    kategori:document.getElementById('kategoriUsahaSearch').value,
-    jam:document.getElementById('jamUsaha').value,
-    produk:document.getElementById('produkUsaha').value,
-    segmen:document.getElementById('segmenUsaha').value,
-    namaPengisi:document.getElementById('namaPengisiSearch').value,
-    unitKerja:document.getElementById('unitPengisiSearch').value,
-    lat:markerSearch?markerSearch.getLngLat().lat:0,
-    lng:markerSearch?markerSearch.getLngLat().lng:0,
-    fotoCount:fotos.length,
-    fotos
-  });
-  alert('Data tersimpan dari pencarian');
-  e.target.reset();
-  document.getElementById('fotoPreviewSearch').innerHTML = '';
+  try {
+    await add(STORE_USAHA,{
+      tgl:new Date().toLocaleString('id-ID'),
+      namaUsaha:document.getElementById('namaUsahaSearch').value,
+      alamat:document.getElementById('alamatUsahaSearch').value,
+      kategori:document.getElementById('kategoriUsahaSearch').value,
+      jam:document.getElementById('jamUsaha').value,
+      produk:document.getElementById('produkUsaha').value,
+      segmen:document.getElementById('segmenUsaha').value,
+      namaPengisi:document.getElementById('namaPengisiSearch').value,
+      unitKerja:document.getElementById('unitPengisiSearch').value,
+      lat:markerSearch?markerSearch.getLngLat().lat:0,
+      lng:markerSearch?markerSearch.getLngLat().lng:0,
+      fotoCount:fotos.length,
+      fotos
+    });
+    alert('Data tersimpan dari pencarian');
+    e.target.reset();
+    document.getElementById('fotoPreviewSearch').innerHTML = '';
+  } catch(err) {
+    alert('Gagal simpan data: ' + err.message);
+  }
 });
 
 /* ========= Auto-Save Draft tiap 15 detik ========= */
@@ -655,49 +696,64 @@ window.addEventListener('load', () => {
 
 /* ========= Export / Lihat ========= */
 async function lihatData(){
-  const usaha = await getAll(STORE_USAHA);
-  const div=document.getElementById('listData'); div.innerHTML='';
-  div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p>${u.namaUsaha} - ${u.alamat}</p>`).join('');
+  try {
+    await openDB(); // Pastikan DB siap
+    const usaha = await getAll(STORE_USAHA);
+    const div=document.getElementById('listData'); div.innerHTML='';
+    div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p>${u.namaUsaha} - ${u.alamat}</p>`).join('');
+  } catch(err) {
+    alert('Gagal baca data: ' + err.message);
+  }
 }
 async function exportExcel(){
-  const usaha = await getAll(STORE_USAHA);
-  const poi = await getAll(STORE_POI);
-  const wb = XLSX.utils.book_new();
-  const wsUsaha = XLSX.utils.json_to_sheet(usaha);
-  const wsPoi = XLSX.utils.json_to_sheet(poi);
-  XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
-  XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
-  XLSX.writeFile(wb,"Pitaloka_Data.xlsx");
+  try {
+    await openDB();
+    const usaha = await getAll(STORE_USAHA);
+    const poi = await getAll(STORE_POI);
+    const wb = XLSX.utils.book_new();
+    const wsUsaha = XLSX.utils.json_to_sheet(usaha);
+    const wsPoi = XLSX.utils.json_to_sheet(poi);
+    XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
+    XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
+    XLSX.writeFile(wb,"Pitaloka_Data.xlsx");
+  } catch(err) {
+    alert('Gagal ekspor Excel: ' + err.message);
+  }
 }
 
 /* ========= Share File (.xlsx) ========= */
 async function shareData(){
-  const usaha = await getAll(STORE_USAHA);
-  const poi = await getAll(STORE_POI);
-  const wb = XLSX.utils.book_new();
-  const wsUsaha = XLSX.utils.json_to_sheet(usaha);
-  const wsPoi = XLSX.utils.json_to_sheet(poi);
-  XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
-  XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
-  
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  const file = new File([blob], "Pitaloka_Data.xlsx", { type: blob.type });
+  try {
+    await openDB();
+    const usaha = await getAll(STORE_USAHA);
+    const poi = await getAll(STORE_POI);
+    const wb = XLSX.utils.book_new();
+    const wsUsaha = XLSX.utils.json_to_sheet(usaha);
+    const wsPoi = XLSX.utils.json_to_sheet(poi);
+    XLSX.utils.book_append_sheet(wb,wsUsaha,"Usaha");
+    XLSX.utils.book_append_sheet(wb,wsPoi,"POI");
+    
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const file = new File([blob], "Pitaloka_Data.xlsx", { type: blob.type });
 
-  if ('share' in navigator) {
-    try {
-      await navigator.share({
-        title: 'Data Pitaloka',
-        text: 'Berikut data lokasi usaha dari Pitaloka.',
-        files: [file]
-      });
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        fallbackShare(file);
+    if ('share' in navigator) {
+      try {
+        await navigator.share({
+          title: 'Data Pitaloka',
+          text: 'Berikut data lokasi usaha dari Pitaloka.',
+          files: [file]
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          fallbackShare(file);
+        }
       }
+    } else {
+      fallbackShare(file);
     }
-  } else {
-    fallbackShare(file);
+  } catch(err) {
+    alert('Gagal share data: ' + err.message);
   }
 }
 
@@ -742,6 +798,16 @@ function haversine(lat1,lon1,lat2,lon2){
   const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
   const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
   return 2*R*Math.asin(Math.sqrt(a))/1000;
+}
+
+// Utility
+function fileToBase64(f){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsDataURL(f);
+  });
 }
 </script>
 </body>
