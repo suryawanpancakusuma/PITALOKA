@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>Pitaloka – Lili</title>
+<title>Pitaloka – Rafflesia</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#00796b"/>
-<link rel="manifest" href="data:application/manifest+json,{
-  &quot;name&quot;:&quot;Pitaloka Lili&quot;,
+<link rel="manifest" href="application/manifest+json,{
+  &quot;name&quot;:&quot;Pitaloka Rafflesia&quot;,
   &quot;short_name&quot;:&quot;Pitaloka&quot;,
-  &quot;start_url&quot;:&quot;./pitaloka-lili.html&quot;,
+  &quot;start_url&quot;:&quot;./pitaloka-rafflesia.html&quot;,
   &quot;display&quot;:&quot;standalone&quot;,
   &quot;background_color&quot;:&quot;#ffffff&quot;,
   &quot;theme_color&quot;:&quot;#00796b&quot;
@@ -25,86 +25,96 @@
     :root { --bg: #f5f5f5; --text: #222; --input-bg: #fff; --btn-bg: #00796b; }
   }
 
-  html,body{margin:0;padding:0;height:100%;font-family:system-ui,Arial;background:url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;color:var(--text)}
-  .header{text-align:center;padding:8px 0;background:rgba(0,0,0,0.45)}
-  .header h1{margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;text-shadow:2px 2px 4px #000}
-  .header .sub{font-size:1em;color:#FFD700;margin-top:-4px;text-shadow:1px 1px 2px #000}
-  .header .salam{margin:2px 0;font-size:1.1em;color:#fff;text-shadow:1px 1px 2px #000}
-  .header .clock{margin:0;font-size:1.3em;color:#fff;font-weight:bold;text-shadow:1px 1px 2px #000}
-  .tabs{display:flex;background:var(--btn-bg);color:#fff}
-  .tabs button{flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff}
-  .tabs button.active{background:#004c40;font-weight:bold}
-  .tab-content{display:none;padding:12px}
-  .tab-content.active{display:block}
-  .map-container{height:55vh;border-radius:6px;margin-bottom:8px;overflow:hidden}
-  #map,#mapSearch{height:100%}
-  #coordBox{background:rgba(0,0,0,0.7);color:#fff;padding:6px;border-radius:4px;font-size:.9em;margin-bottom:6px}
-  label{display:block;margin:6px 0 2px;font-size:.9em;color:var(--text)}
-  input,textarea,select{width:100%;padding:6px;border-radius:4px;border:1px solid #aaa;background:var(--input-bg);color:var(--text)}
-  button.primary{background:var(--btn-bg);color:#fff;border:none;padding:8px 16px;border-radius:4px;margin-top:6px}
-  #poiListWrapper{background:rgba(0,0,0,0.75);border-radius:8px;padding:10px;color:#fff}
-  #poiList{max-height:60vh;overflow:auto}
-  .poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff}
-  #toastHover{
-    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-    background:rgba(0,0,0,0.85);color:#FFD700;padding:18px 28px;
-    border-radius:10px;font-size:1.2em;font-weight:bold;z-index:99999;
-    cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.5);transition:opacity .4s;opacity:0;pointer-events:none}
-  #toastHover.show{opacity:1;pointer-events:auto}
+  /* Latar belakang: Pura Ulun Danu Beratan, tanpa overlay gelap */
+  html,body{
+    margin:0;padding:0;height:100%;font-family:system-ui,Arial;
+    background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;
+    color:var(--text);
+  }
+  .header{text-align:center;padding:8px 0;}
+  .header h1{
+    margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;
+    text-shadow:2px 2px 6px rgba(0,0,0,0.7);
+  }
+  .header .sub{
+    font-size:1em;color:#FFD700;margin-top:-4px;
+    text-shadow:1px 1px 4px rgba(0,0,0,0.7);
+  }
+  .header .salam,.header .clock{
+    margin:2px 0;font-size:1.1em;color:#fff;
+    text-shadow:1px 1px 4px rgba(0,0,0,0.7);
+  }
+  .tabs{display:flex;background:rgba(0,121,107,0.9);color:#fff;}
+  .tabs button{
+    flex:1;padding:12px;border:none;background:none;font-size:1em;color:#fff;
+  }
+  .tabs button.active{
+    background:#004c40;font-weight:bold;
+  }
+  .tab-content{display:none;padding:12px;}
+  .tab-content.active{display:block;}
+  .map-container{height:55vh;border-radius:6px;margin-bottom:8px;overflow:hidden;}
+  #map,#mapSearch{height:100%;}
+  #coordBox{
+    background:rgba(0,0,0,0.7);
+    color:#fff;padding:6px;border-radius:4px;
+    font-size:.9em;margin-bottom:6px;
+  }
+  label{
+    display:block;margin:6px 0 2px;font-size:.9em;
+    color:var(--text);
+  }
+  input,textarea,select{
+    width:100%;padding:6px;border-radius:4px;
+    border:1px solid #aaa;background:var(--input-bg);
+    color:var(--text);
+  }
+  button.primary{
+    background:var(--btn-bg);color:#fff;border:none;
+    padding:8px 16px;border-radius:4px;margin-top:6px;
+  }
+  #poiListWrapper{
+    background:rgba(0,0,0,0.75);border-radius:8px;
+    padding:10px;color:#fff;
+  }
+  #poiList{max-height:60vh;overflow:auto;}
+  .poiItem{border-bottom:1px solid #444;padding:8px 0;color:#fff;}
   #watermark{
     position:fixed;z-index:999;top:50%;left:50%;
-    font-size:2.2em;font-weight:bold;color:rgba(255,255,255,.55);
-    animation:spin 6s linear infinite,blink 1.2s infinite;
-    pointer-events:none;transform:translate(-50%,-50%);}
-  footer{text-align:center;padding:8px;font-size:.85em;color:#fff;background:rgba(0,0,0,0.5)}
-  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-  @keyframes blink{0%,100%{opacity:.55}50%{opacity:0}}
+    font-size:2.2em;font-weight:bold;color:#D2B48C; /* pasir pantai */
+    text-shadow:2px 2px 8px rgba(0,0,0,0.5);
+    opacity:0;pointer-events:none;transform:translate(-50%,-50%);
+    transition:opacity 0.8s ease-in-out;
+  }
+  #watermark.show{opacity:0.7;}
+  footer{
+    text-align:center;padding:8px;font-size:.85em;
+    color:#fff;background:rgba(0,0,0,0.5);
+  }
   /* Fullscreen Image Viewer */
   .img-modal{display:none;position:fixed;z-index:1000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);align-items:center;justify-content:center}
   .img-modal img{max-width:90%;max-height:90%}
   /* QR Code Style */
-  .qrcode-section {
-    text-align: center;
-    margin: 15px 0;
-    opacity: 0.95;
+  .qrcode-container {
+    display:flex;justify-content:space-between;align-items:center;
+    padding:0 10px;flex-wrap:wrap;gap:10px;margin:10px 0;
   }
-  .qrcode-section img {
-    width: 120px;
-    height: 120px;
-    border: 2px solid rgba(255,215,0,0.6);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  .qrcode-item {
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .qrcode-item img {
+    width: 80px;height: 80px;border: 1px solid rgba(255,215,0,0.6);
+    border-radius: 8px;box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     background: rgba(255,255,255,0.1);
   }
-  .qrcode-section p {
-    font-size: 0.9rem;
-    margin: 5px 0;
-    color: rgba(255,255,255,0.9);
+  .qrcode-item p {
+    font-size: 0.75rem;margin: 2px 0;color: rgba(255,255,255,0.9);
     text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
   }
-  /* Cloud Layer */
-  .cloud-layer{
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.2) 70%);
-    z-index:9997;pointer-events:none;transition:opacity 2s ease-out;
+  /* Search Hint */
+  .search-hint {
+    font-size: 0.85em;color: #aaa;margin: 4px 0 8px;text-align: center;
   }
-  /* Location Button */
-  .location-btn{
-    display:block;
-    width:80%;
-    max-width:300px;
-    margin:10px auto;
-    background:#00796b;
-    color:white;
-    border:none;
-    padding:12px;
-    border-radius:8px;
-    font-size:1.1em;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
-  }
-  .location-btn.off{background:#d32f2f;}
 </style>
 </head>
 <body>
@@ -125,12 +135,6 @@
 
 <!-- TAB 1 -->
 <div id="tab1" class="tab-content active">
-  <!-- Cloud Layer -->
-  <div class="cloud-layer" id="cloudLayer1"></div>
-  <!-- Toast Hover -->
-  <div id="toastHover">☁️ Klik untuk tembus awan & menukik ke lokasi Anda</div>
-  <!-- Location Button -->
-  <button id="locationBtn" class="location-btn" onclick="toggleLocation()">📍 Location: OFF</button>
   <!-- Map Container -->
   <div class="map-container">
     <div id="map"></div>
@@ -173,12 +177,10 @@
 <!-- TAB 3 -->
 <div id="tab3" class="tab-content">
   <h3 style="color:#fff;text-shadow:1px 1px 2px #000">🔍 Cari Lokasi</h3>
-  <!-- Cloud Layer -->
-  <div class="cloud-layer" id="cloudLayer3"></div>
-  <!-- Toast Hover -->
-  <div id="toastHover3">☁️ Klik untuk tembus awan & menukik ke lokasi Anda</div>
-  <!-- Location Button -->
-  <button id="locationBtn3" class="location-btn" onclick="toggleLocation3()">📍 Location: OFF</button>
+  <!-- Search Hint -->
+  <div class="search-hint">Ketik alamat, koordinat, atau klik lokasi di peta</div>
+  <!-- Search Input -->
+  <input type="text" id="searchInput" placeholder="Nama jalan, desa, pura, atau koordinat..." style="font-size:0.9em;margin-bottom:8px">
   <!-- Map Container -->
   <div class="map-container">
     <div id="mapSearch"></div>
@@ -210,14 +212,22 @@
 </div>
 
 <!-- QR Code Section -->
-<div class="qrcode-section">
-  <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://suryawanpancakusuma.github.io/PITALOKA/&margin=1&ecc=M" alt="QR Code Pitaloka">
-  <p>📲 Akses cepat ke Pitaloka</p>
+<div class="qrcode-container">
+  <!-- QR Pitaloka -->
+  <div class="qrcode-item">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://suryawanpancakusuma.github.io/PITALOKA/&margin=1&ecc=M" alt="QR Pitaloka">
+    <p>Akses Cepat</p>
+  </div>
+  <!-- QR WhatsApp Support -->
+  <div class="qrcode-item">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://wa.me/6281632105566&margin=1&ecc=M" alt="QR WhatsApp">
+    <p>Dukungan Teknis</p>
+  </div>
 </div>
 
 <!-- Footer -->
 <footer>
-  made with ❤️ by suryawanp - versi Lili
+  made with ❤️ by suryawanp - versi Rafflesia
 </footer>
 
 <script>
@@ -225,7 +235,7 @@
 if('serviceWorker' in navigator){
   const swCode = `
 self.addEventListener('install',e=>e.waitUntil(
-  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-lili.html']))
+  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-rafflesia.html']))
 ));
 self.addEventListener('fetch',e=>{
   e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
@@ -273,20 +283,26 @@ setInterval(updateClock,1000); updateClock();
 /* ========= Tab switcher ========= */
 const tabs = document.querySelectorAll('.tab-content');
 const btns = document.querySelectorAll('.tabs button');
+let map, marker, mapSearch, markerSearch;
+
 function switchTab(idx){
   tabs.forEach(t=>t.classList.remove('active'));
   btns.forEach(b=>b.classList.remove('active'));
   tabs[idx].classList.add('active');
   btns[idx].classList.add('active');
+
+  if(idx === 2 && mapSearch) {
+    setTimeout(() => {
+      mapSearch.resize();
+      if(!markerSearch) getLocation3();
+    }, 300);
+  }
 }
 document.getElementById('tab1Btn').onclick = ()=>switchTab(0);
 document.getElementById('tab2Btn').onclick = ()=>{ switchTab(1); fetchPOI(); };
 document.getElementById('tab3Btn').onclick = ()=>switchTab(2);
 
-/* ========= Map Utama (dengan efek sinematik) ========= */
-let map, marker;
-
-// Inisialisasi peta utama dari luar angkasa (satelit)
+/* ========= Map Utama (Satelit, Zoom 18 max) ========= */
 map = new maplibregl.Map({
   container: 'map',
   style: {
@@ -297,7 +313,8 @@ map = new maplibregl.Map({
   center: [118, -2.5],
   zoom: 4.5,
   pitch: 0,
-  bearing: 0
+  bearing: 0,
+  maxZoom: 18
 });
 
 // Tambahkan kompas
@@ -356,33 +373,47 @@ function setBase(mode){
   map.setStyle(styles[mode]);
 }
 
-/* ========= Geolocation + efek menembus awan (untuk Tab 1) ========= */
-document.getElementById('toastHover').onclick = async function(){
-  const cloudLayer = document.getElementById('cloudLayer1');
-  cloudLayer.style.opacity = '1';
-  setTimeout(() => cloudLayer.style.opacity = '0', 2000);
-  this.style.display = 'none';
+/* ========= Geolocation + efek menukik (Superman) ========= */
+function getLocation(){
   try{
-    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
-    const { longitude, latitude, accuracy } = pos.coords;
-    if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
-    map.flyTo({
-      center: [longitude, latitude],
-      zoom: 18,
-      speed: 1.8,
-      curve: 1.6,
-      easing(t) { return t; },
-      essential: true
-    });
-    if(marker) marker.remove();
-    marker = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
-    document.getElementById('coordBox').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-    document.getElementById('alamatUsaha').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-    await fetchAddress(latitude, longitude, document.getElementById('alamatUsaha'));
+    const pos = navigator.geolocation.getCurrentPosition(pos => {
+      const { longitude, latitude, accuracy } = pos.coords;
+      if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
+      map.flyTo({
+        center: [longitude, latitude],
+        zoom: 18,
+        speed: 1.8,
+        curve: 1.6,
+        easing(t) { return t; },
+        essential: true
+      });
+      if(marker) marker.remove();
+      marker = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
+      document.getElementById('coordBox').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+      document.getElementById('alamatUsaha').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+      fetchAddress(latitude, longitude, document.getElementById('alamatUsaha'));
+    }, err => {
+      console.warn('Gagal dapat lokasi:', err.message);
+    }, {enableHighAccuracy:true,timeout:15000});
   }catch(err){
-    alert('Gagal mendapatkan lokasi GPS: ' + err.message);
+    console.error('Error:', err);
   }
-};
+}
+
+// Panggil otomatis saat halaman dimuat
+window.addEventListener('load', () => {
+  setTimeout(getLocation, 500);
+  // Mulai efek watermark
+  showWatermark();
+  setInterval(showWatermark, 15000);
+});
+
+// Efek watermark: muncul 3 detik, lalu hilang
+function showWatermark(){
+  const wm = document.getElementById('watermark');
+  wm.classList.add('show');
+  setTimeout(() => wm.classList.remove('show'), 3000);
+}
 
 /* ========= Search Address ========= */
 async function fetchAddress(lat, lng, inputEl){
@@ -393,10 +424,7 @@ async function fetchAddress(lat, lng, inputEl){
   }catch{ inputEl.value = 'Gagal muat alamat'; }
 }
 
-/* ========= Map Pencarian (dengan efek sinematik juga!) ========= */
-let mapSearch, markerSearch;
-
-// Inisialisasi peta pencarian dari luar angkasa
+/* ========= Map Pencarian (Zoom 18 max) ========= */
 mapSearch = new maplibregl.Map({
   container: 'mapSearch',
   style: {
@@ -407,21 +435,14 @@ mapSearch = new maplibregl.Map({
   center: [118, -2.5],
   zoom: 4.5,
   pitch: 0,
-  bearing: 0
+  bearing: 0,
+  maxZoom: 18
 });
 
+// Tambahkan kompas
 mapSearch.addControl(new maplibregl.NavigationControl());
 
-// Klik peta pencarian
-mapSearch.on('click', (e) => {
-  const { lng, lat } = e.lngLat;
-  document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-  if(markerSearch) markerSearch.remove();
-  markerSearch = new maplibregl.Marker().setLngLat([lng, lat]).addTo(mapSearch);
-  document.getElementById('alamatUsahaSearch').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-});
-
-// Tambahkan kontrol layer ke peta pencarian
+// Tambahkan kontrol layer
 const layerControl3 = document.createElement('div');
 layerControl3.className = 'maplibregl-ctrl';
 layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; z-index: 1000;';
@@ -435,6 +456,15 @@ layerControl3.style.cssText = 'position: absolute; bottom: 10px; left: 10px; dis
 });
 mapSearch.on('load', () => {
   mapSearch.getContainer().appendChild(layerControl3);
+});
+
+// Klik peta pencarian
+mapSearch.on('click', (e) => {
+  const { lng, lat } = e.lngLat;
+  document.getElementById('coordBoxSearch').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+  if(markerSearch) markerSearch.remove();
+  markerSearch = new maplibregl.Marker().setLngLat([lng, lat]).addTo(mapSearch);
+  document.getElementById('alamatUsahaSearch').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
 });
 
 // Layer toggle untuk peta pencarian
@@ -466,32 +496,31 @@ function setBase3(mode){
 }
 
 // Geolocation untuk Tab 3
-document.getElementById('toastHover3').onclick = async function(){
-  const cloudLayer = document.getElementById('cloudLayer3');
-  cloudLayer.style.opacity = '1';
-  setTimeout(() => cloudLayer.style.opacity = '0', 2000);
-  this.style.display = 'none';
+function getLocation3(){
   try{
-    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000}));
-    const { longitude, latitude, accuracy } = pos.coords;
-    if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
-    mapSearch.flyTo({
-      center: [longitude, latitude],
-      zoom: 18,
-      speed: 1.8,
-      curve: 1.6,
-      easing(t) { return t; },
-      essential: true
-    });
-    if(markerSearch) markerSearch.remove();
-    markerSearch = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(mapSearch);
-    document.getElementById('coordBoxSearch').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-    document.getElementById('alamatUsahaSearch').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-    await fetchAddress(latitude, longitude, document.getElementById('alamatUsahaSearch'));
+    const pos = navigator.geolocation.getCurrentPosition(pos => {
+      const { longitude, latitude, accuracy } = pos.coords;
+      if(accuracy > 10) alert(`Akurasi GPS: ${accuracy.toFixed(1)}m`);
+      mapSearch.flyTo({
+        center: [longitude, latitude],
+        zoom: 18,
+        speed: 1.8,
+        curve: 1.6,
+        easing(t) { return t; },
+        essential: true
+      });
+      if(markerSearch) markerSearch.remove();
+      markerSearch = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(mapSearch);
+      document.getElementById('coordBoxSearch').textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+      document.getElementById('alamatUsahaSearch').value = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+      fetchAddress(latitude, longitude, document.getElementById('alamatUsahaSearch'));
+    }, err => {
+      console.warn('Gagal dapat lokasi:', err.message);
+    }, {enableHighAccuracy:true,timeout:15000});
   }catch(err){
-    alert('Gagal mendapatkan lokasi GPS: ' + err.message);
+    console.error('Error:', err);
   }
-};
+}
 
 // Search input
 document.getElementById('searchInput').addEventListener('keypress', async (e) => {
@@ -512,6 +541,13 @@ document.getElementById('searchInput').addEventListener('keypress', async (e) =>
     }
   }catch{ alert('Gagal mencari'); }
 });
+
+// Fokus otomatis ke input pencarian saat tab dibuka
+function focusSearch(){
+  setTimeout(() => {
+    document.getElementById('searchInput').focus();
+  }, 300);
+}
 
 /* ========= Foto Preview & Modal ========= */
 ['fotoUsaha', 'fotoUsahaSearch'].forEach(id => {
@@ -615,9 +651,6 @@ window.addEventListener('load', () => {
   Object.keys(draft).forEach(k => {
     if(document.getElementById(k)) document.getElementById(k).value = draft[k];
   });
-  // Tampilkan toast saat halaman dimuat
-  document.getElementById('toastHover').classList.add('show');
-  document.getElementById('toastHover3').classList.add('show');
 });
 
 /* ========= Export / Lihat ========= */
@@ -709,33 +742,6 @@ function haversine(lat1,lon1,lat2,lon2){
   const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
   const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
   return 2*R*Math.asin(Math.sqrt(a))/1000;
-}
-
-/* ========= Location Toggle Button ========= */
-function toggleLocation(){
-  const btn = document.getElementById('locationBtn');
-  if(btn.textContent.includes('OFF')){
-    btn.textContent = '📍 Location: ON';
-    btn.classList.remove('off');
-    document.getElementById('toastHover').classList.add('show');
-  }else{
-    btn.textContent = '📍 Location: OFF';
-    btn.classList.add('off');
-    document.getElementById('toastHover').classList.remove('show');
-  }
-}
-
-function toggleLocation3(){
-  const btn = document.getElementById('locationBtn3');
-  if(btn.textContent.includes('OFF')){
-    btn.textContent = '📍 Location: ON';
-    btn.classList.remove('off');
-    document.getElementById('toastHover3').classList.add('show');
-  }else{
-    btn.textContent = '📍 Location: OFF';
-    btn.classList.add('off');
-    document.getElementById('toastHover3').classList.remove('show');
-  }
 }
 </script>
 </body>
