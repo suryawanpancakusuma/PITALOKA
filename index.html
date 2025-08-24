@@ -2,40 +2,45 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>Pitaloka – Kimi</title>
+<title>Pitaloka – Wijaya</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#00796b"/>
-<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Pitaloka Kimi&quot;,&quot;short_name&quot;:&quot;Pitaloka&quot;,&quot;start_url&quot;:&quot;./pitaloka-kimi.html&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#00796b&quot;}">
+<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Pitaloka Wijaya&quot;,&quot;short_name&quot;:&quot;Pitaloka&quot;,&quot;start_url&quot;:&quot;./pitaloka-wijaya.html&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#00796b&quot;}">
 <link href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-  /* Mode Gelap Otomatis */
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #121212; --text: #eee; --input-bg: #333; --btn-bg: #00695c; }
-  }
-  @media (prefers-color-scheme: light) {
-    :root { --bg: #f5f5f5; --text: #222; --input-bg: #fff; --btn-bg: #00796b; }
-  }
-
-  /* Latar belakang: Pura Ulun Danu Beratan, dengan overlay tipis */
+  /* Latar belakang: Pura Ulun Danu Batur, Bali */
   html,body{
     margin:0;padding:0;height:100%;font-family:system-ui,Arial;
-    background: url('https://images.unsplash.com/photo-1598135753163-6167ff2f19a3?w=1600&q=85') center/cover fixed;
+    background: url('https://images.unsplash.com/photo-1545251142-f32339076e6d?w=1600&q=85') no-repeat center center fixed;
+    background-size: cover;
     color: #fff;
   }
+  /* Overlay: gradien halus agar teks kontras */
   body::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg,
+      rgba(0, 0, 0, 0.4),
+      rgba(30, 10, 10, 0.5)
+    );
     z-index: -1;
   }
 
-  .header{text-align:center;padding:8px 0;}
+  /* Header indah seperti versi awal */
+  .header{
+    text-align:center;padding:12px 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    margin: 8px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
   .header h1{
     margin:0;font-size:2.3em;font-weight:bold;color:#FFD700;
-    text-shadow:2px 2px 6px rgba(0,0,0,0.8);
+    text-shadow:2px 2px 8px rgba(0,0,0,0.9);
   }
   .header .sub{
     font-size:1em;color:#FFD700;margin-top:-4px;
@@ -67,11 +72,11 @@
   }
   input,textarea,select{
     width:100%;padding:6px;border-radius:4px;
-    border:1px solid #aaa;background:var(--input-bg);
-    color:var(--text);
+    border:1px solid #aaa;background:rgba(255,255,255,0.9);
+    color:#222;
   }
   button.primary{
-    background:var(--btn-bg);color:#fff;border:none;
+    background:#00796b;color:#fff;border:none;
     padding:8px 16px;border-radius:4px;margin-top:6px;
   }
   #poiListWrapper{
@@ -148,7 +153,7 @@
 <body>
 <!-- Header -->
 <div class="header">
-  <h1><span style="font-size:1.3em">✨</span> PITALOKA <span style="font-size:1.3em">✨</span></h1>
+  <h1><span style="font-size:1.3em">🌸</span> PITALOKA <span style="font-size:1.3em">🌸</span></h1>
   <div class="sub">Pengisian Data Lokasi Usaha</div>
   <div class="salam" id="salam">Selamat datang</div>
   <div class="clock" id="clock">--:--, --.--.----</div>
@@ -255,7 +260,7 @@
 
 <!-- Footer -->
 <footer>
-  made with ❤️ by suryawanp - versi Kimi
+  made with ❤️ by suryawanp - versi Wijaya
 </footer>
 
 <script>
@@ -263,7 +268,7 @@
 if('serviceWorker' in navigator){
   const swCode = `
 self.addEventListener('install',e=>e.waitUntil(
-  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-kimi.html']))
+  caches.open('pitaloka-v1').then(c=>c.addAll(['./pitaloka-wijaya.html']))
 ));
 self.addEventListener('fetch',e=>{
   e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
@@ -711,7 +716,7 @@ async function lihatData(){
     const div=document.getElementById('listData'); div.innerHTML='';
     div.innerHTML=`<h4>Data Usaha (${usaha.length})</h4>`+usaha.map(u=>`<p><strong>${u.namaUsaha}</strong><br>${u.alamat}<br>${u.tgl}</p>`).join('');
   } catch(err) {
-    alert('Gagal baca data: ' + err.message);
+    alert('Gagal baca  ' + err.message);
   }
 }
 
